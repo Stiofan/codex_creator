@@ -41,24 +41,34 @@ function codex_creator_get_file_functions_arr( $file )
     $file_output = codex_creator_get_file($file);
 
     $tokens = token_get_all($file_output);
-
+    //print_r($tokens);
     $func_arr = array();
     foreach ($tokens as $key => $token) {
 
         if (is_array($token)) {
-            //list($id, $text) = $token;
-            //echo token_name($id)."\r\n";
-            if ($token[0] == '334') {
+
+            //if we detect a class assume there are no functions
+            if(token_name((int) $token[0]) == 'T_CLASS'){
+                break;
+            }
+
+
+
+
+
+            if ( token_name((int) $token[0]) == 'T_FUNCTION') {
                 // check for docblock
                 $doc_block = '';
                 $fnc_name = '';
-                if ($tokens[$key - 1][0] == '375' && $tokens[$key - 2][0] == '371') {
+                if (token_name((int) $tokens[$key - 1][0]) == 'T_WHITESPACE' && token_name((int) $tokens[$key - 2][0]) == 'T_DOC_COMMENT') {
                     $doc_block = $tokens[$key - 2][1];
 
 
                 }
 
-                if ($tokens[$key + 1][0] == '375' && $tokens[$key + 2][0] == '307') {
+
+
+                if (token_name((int) $tokens[$key + 1][0]) == 'T_WHITESPACE' && token_name((int) $tokens[$key + 2][0]) == 'T_STRING') {
                     $fnc_name = $tokens[$key + 2][1];
                     $func_arr[] = array($doc_block, $fnc_name, $token[2]);
                 }
@@ -71,7 +81,6 @@ function codex_creator_get_file_functions_arr( $file )
 
     }
 
-
     if(!empty($func_arr)) {
         return $func_arr;
     }else{
@@ -81,7 +90,7 @@ function codex_creator_get_file_functions_arr( $file )
 
 function codex_creator_get_file_functions( $file ) {
 
-    codex_creator_get_file_functions_arr( $file );
+    $func_arr = codex_creator_get_file_functions_arr( $file );
 
 	if(!empty($func_arr)){
 		echo '<ul class="cc-function-tree">';
@@ -91,7 +100,7 @@ function codex_creator_get_file_functions( $file ) {
 			}else{
 				$func_info = '<i class="fa fa-exclamation-triangle" title="'.__( 'Function does not contain a DocBlock', WP_CODEX_TEXTDOMAIN ).'"></i>';
 			}
-			echo '<li data-cc-scan-function="'.$file.'" class="cc-file-tree-function">'.$fnc_name[1].' [line: '.$fnc_name[2].']';
+			echo '<li data-cc-scan-file="'.$file.'" data-cc-scan-function="'.$fnc_name[1].'" class="cc-file-tree-function">'.$fnc_name[1].' [line: '.$fnc_name[2].']';
 			echo '<span class="cc-function-info-bloc">'.$func_info.'</span>';
 			echo '</li>';
 		}
@@ -108,7 +117,8 @@ function codex_creator_get_file_functions( $file ) {
 function codex_creator_post_exits($title, $cat)
 {   global $wpdb;
 
-    $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE 'name'=%s", $cat));
+    $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $cat));
+
     if(! $term_id ){return false;}
 
     $post_id = $wpdb->get_var($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d AND p.post_title=%s",$term_id ,$title));

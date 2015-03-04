@@ -32,28 +32,7 @@ function codex_creator_meta_box_callback( $post ) {
 	 * from the database and use the value for the form.
 	 */
 
-	$dock_blocks = array(
-		'summary'      => __( 'Summary', WP_CODEX_TEXTDOMAIN ),
-		'description'  => __( 'Description', WP_CODEX_TEXTDOMAIN ),
-		'access'       => __( 'Access', WP_CODEX_TEXTDOMAIN ),
-		'deprecated'   => __( 'Deprecated', WP_CODEX_TEXTDOMAIN ),
-		'global'       => __( 'Global Values', WP_CODEX_TEXTDOMAIN ),
-		'internal'     => __( 'Internal', WP_CODEX_TEXTDOMAIN ),
-		'ignore'       => __( 'Ignore', WP_CODEX_TEXTDOMAIN ),
-		'link'         => __( 'Link', WP_CODEX_TEXTDOMAIN ),
-		'method'       => __( 'Method', WP_CODEX_TEXTDOMAIN ),
-		'package'      => __( 'Package', WP_CODEX_TEXTDOMAIN ),
-		'param'        => __( 'Params', WP_CODEX_TEXTDOMAIN ),
-		'return'       => __( 'Returns', WP_CODEX_TEXTDOMAIN ),
-		'see'          => __( 'See', WP_CODEX_TEXTDOMAIN ),
-		'since'        => __( 'Since', WP_CODEX_TEXTDOMAIN ),
-		'subpackage'   => __( 'Subpackage', WP_CODEX_TEXTDOMAIN ),
-		'todo'         => __( 'Todo', WP_CODEX_TEXTDOMAIN ),
-		'type'         => __( 'Type', WP_CODEX_TEXTDOMAIN ),
-		'uses'         => __( 'Uses', WP_CODEX_TEXTDOMAIN ),
-		'var'          => __( 'Var', WP_CODEX_TEXTDOMAIN ),
-
-	);
+    $dock_blocks = codex_creator_suported_docblocks();
 
 	foreach ( $dock_blocks as $key => $title ) {
 
@@ -75,6 +54,8 @@ function codex_creator_meta_box_callback( $post ) {
 	}
 
 }
+
+
 
 
 /**
@@ -122,28 +103,7 @@ function codex_creator_save_meta_box_data( $post_id ) {
 
 
 
-	$dock_blocks = array(
-		'summary'      => __( 'Summary', WP_CODEX_TEXTDOMAIN ),
-		'description'  => __( 'Description', WP_CODEX_TEXTDOMAIN ),
-		'access'       => __( 'Access', WP_CODEX_TEXTDOMAIN ),
-		'deprecated'   => __( 'Deprecated', WP_CODEX_TEXTDOMAIN ),
-		'global'       => __( 'Global Values', WP_CODEX_TEXTDOMAIN ),
-		'internal'     => __( 'Internal', WP_CODEX_TEXTDOMAIN ),
-		'ignore'       => __( 'Ignore', WP_CODEX_TEXTDOMAIN ),
-		'link'         => __( 'Link', WP_CODEX_TEXTDOMAIN ),
-		'method'       => __( 'Method', WP_CODEX_TEXTDOMAIN ),
-		'package'      => __( 'Package', WP_CODEX_TEXTDOMAIN ),
-		'param'        => __( 'Params', WP_CODEX_TEXTDOMAIN ),
-		'return'       => __( 'Returns', WP_CODEX_TEXTDOMAIN ),
-		'see'          => __( 'See', WP_CODEX_TEXTDOMAIN ),
-		'since'        => __( 'Since', WP_CODEX_TEXTDOMAIN ),
-		'subpackage'   => __( 'Subpackage', WP_CODEX_TEXTDOMAIN ),
-		'todo'         => __( 'Todo', WP_CODEX_TEXTDOMAIN ),
-		'type'         => __( 'Type', WP_CODEX_TEXTDOMAIN ),
-		'uses'         => __( 'Uses', WP_CODEX_TEXTDOMAIN ),
-		'var'          => __( 'Var', WP_CODEX_TEXTDOMAIN ),
-
-	);
+	$dock_blocks = codex_creator_suported_docblocks();
 
 	foreach($dock_blocks as $key=>$title){
 		if(isset( $_POST['codex_creator_'.$key] )) {

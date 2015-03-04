@@ -111,10 +111,11 @@ function codex_creator_add_project($type,$el) {
 
 
 cc_curent_sync_file = '';
-function codex_creator_sync_project_files($type,$el) {
+function codex_creator_sync_project_files($type,$el,$last) {
     if(!$type || !$el){return;}// bail if no type
 
-    jQuery( ".cc-file-tree-file" ).each(function() {
+    var total_files =  jQuery( ".cc-file-tree-file" ).length;
+    jQuery( ".cc-file-tree-file" ).each(function(index) {
 
 
         if(jQuery(this).data('sync')==1){return true;}
@@ -138,7 +139,14 @@ function codex_creator_sync_project_files($type,$el) {
                 console.log(data);
 
                 jQuery( cc_curent_sync_file).css('background-color', 'red');
-                codex_creator_sync_project_functions($type,$el,cc_curent_sync_file);
+                console.log('#'+index+'@'+total_files);
+                if (index === total_files - 1) {
+                    // this is the last one
+                    codex_creator_sync_project_functions($type,$el,cc_curent_sync_file,1);
+                }else {
+                    codex_creator_sync_project_functions($type,$el,cc_curent_sync_file,0);
+                }
+
             },
             error: function(errorThrown){
                 console.log(errorThrown);
@@ -153,7 +161,7 @@ function codex_creator_sync_project_files($type,$el) {
 }
 
 cc_curent_sync_function = '';
-function codex_creator_sync_project_functions($type,$el,$file) {
+function codex_creator_sync_project_functions($type,$el,$file,$last) {
     if(!$type || !$el){return;}// bail if no type
 
     funcsP = jQuery( $file ).next();
@@ -171,6 +179,8 @@ function codex_creator_sync_project_functions($type,$el,$file) {
 
             cc_curent_sync_function = this;
 
+            file_loc = jQuery(this).data('cc-scan-file');
+            function_name = jQuery(this).data('cc-scan-function');
 
             // This does the ajax request
             jQuery.ajax({
@@ -178,7 +188,9 @@ function codex_creator_sync_project_functions($type,$el,$file) {
                 data: {
                     'action':'codex_creator_sync_function',
                     'c_type' : $type,
-                    'c_name' : $el
+                    'c_name' : $el,
+                    'file_loc' : file_loc,
+                    'function_name' : function_name
                 },
                 success:function(data) {
                     jQuery(this).data('sync',1);
@@ -188,9 +200,17 @@ function codex_creator_sync_project_functions($type,$el,$file) {
 
                     if (index === total_func - 1) {
                         // this is the last one
-                        codex_creator_sync_project_files($type,$el)
+
+                        if($last){
+                            //alert('done0');
+                            codex_creator_calc_project_posts($type,$el);
+
+                        }else {
+                            codex_creator_sync_project_files($type,$el);
+                        }
+
                     }else {
-                        codex_creator_sync_project_functions($type, $el, $file);
+                        codex_creator_sync_project_functions($type, $el, $file,$last);
                     }
                 },
                 error: function(errorThrown){
@@ -209,13 +229,76 @@ function codex_creator_sync_project_functions($type,$el,$file) {
 
 
     }else{// else continue to next file;
-        codex_creator_sync_project_files($type,$el);
+        if($last){
+            alert('done1');
+
+        }else {
+            codex_creator_sync_project_files($type, $el);
+        }
     }
 
 
 
 
 
+
+}
+
+function codex_creator_calc_project_posts($type,$el){
+    // This does the ajax request
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action':'codex_creator_calc_project_posts',
+            'c_type' : $type,
+            'c_name' : $el
+        },
+        success:function(data) {
+            if(data){codex_creator_create_codex_content($type,$el,data);}
+        },
+        error: function(errorThrown){
+            console.log(errorThrown);
+        }
+    });
+
+}
+
+
+function codex_creator_create_codex_content($type,$el,$count){
+
+    // This does the ajax request
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action':'codex_creator_create_content',
+            'c_type' : $type,
+            'c_name' : $el,
+            'count'  : $count
+        },
+        success:function(data) {
+            jQuery(this).data('sync',1);
+            console.log(data);
+
+            jQuery( cc_curent_sync_function ).css('background-color', 'red');
+
+            if (index === total_func - 1) {
+                // this is the last one
+
+                if($last){
+                    alert('done0');
+
+                }else {
+                    codex_creator_sync_project_files($type,$el);
+                }
+
+            }else {
+                codex_creator_sync_project_functions($type, $el, $file,$last);
+            }
+        },
+        error: function(errorThrown){
+            console.log(errorThrown);
+        }
+    });
 
 }
 

@@ -120,11 +120,17 @@ function codex_creator_permalink($permalink, $post_id, $leavename) {
 	// Get taxonomy terms
 	$terms = wp_get_object_terms($post->ID, 'codex_project');
 	//print_r($terms);
+    $taxonomy_slug = '';
 	if (!is_wp_error($terms) && !empty($terms) && is_object($terms[0])) {
-		$taxonomy_slug = $terms[0]->slug;
-	}else{
-		$taxonomy_slug = 'no-project';
+
+        foreach($terms as $term){
+            if($term->parent=='0'){$taxonomy_slug = $term->slug;}
+        }
 	}
+
+    if(!$taxonomy_slug){$taxonomy_slug = 'no-project';}
+
+    //$taxonomy_slug = 'cat1/cat2';
 
 	return str_replace('%codex_project%', $taxonomy_slug, $permalink);
 }
