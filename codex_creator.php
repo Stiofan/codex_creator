@@ -1,4 +1,11 @@
 <?php
+/**
+ * This is the main Codex Creator plugin file
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
+
 /*
 Plugin Name: WordPress Codex Creator
 Plugin URI: http://www.nomaddevs.com/
@@ -9,25 +16,25 @@ Author URI: http://www.nomaddevs.com/
 */
 
 
-ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(-1);
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 /**
  * Define constants
  */
-define( 'WP_CODED_VERSION', '0.0.1' );
-define( 'WP_CODEX_ROOT', __FILE__ );
-define( 'WP_CODEX_ROOT_DOC', __DIR__ );
-define( 'WP_CODEX_TEXTDOMAIN', 'codex_creator' );
-define( 'WP_CODEX_URL', plugin_dir_url( WP_CODEX_ROOT ) );
+define('WP_CODED_VERSION', '0.0.1');
+define('WP_CODEX_ROOT', __FILE__);
+define('WP_CODEX_ROOT_DOC', __DIR__);
+define('WP_CODEX_TEXTDOMAIN', 'codex_creator');
+define('WP_CODEX_URL', plugin_dir_url(WP_CODEX_ROOT));
 
-define( 'WP_CODEX_TITLE_START', "<h4>" );
-define( 'WP_CODEX_TITLE_END', "</h4>" );
-define( 'WP_CODEX_CONTENT_START', "<p>" );
-define( 'WP_CODEX_CONTENT_END', "</p>" );
+define('WP_CODEX_TITLE_START', "<h4>");
+define('WP_CODEX_TITLE_END', "</h4>");
+define('WP_CODEX_CONTENT_START', "<p>");
+define('WP_CODEX_CONTENT_END', "</p>");
 
 
 /**
@@ -36,28 +43,26 @@ define( 'WP_CODEX_CONTENT_END', "</p>" );
 include_once('phpDocumentor/Reflection/DocBlock.php');
 
 
-
 $codex_creator_docblock_include_arr = array(
-	"/phpDocumentor/Reflection/DocBlock/Description.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/ReturnTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/VersionTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/SinceTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/ParamTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/AuthorTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/LinkTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/VarTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/ThrowsTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/SeeTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Tag/UsesTag.php",
-	"/phpDocumentor/Reflection/DocBlock/Type/Collection.php",
-	"/phpDocumentor/Reflection/DocBlock/Context.php",
+    "/phpDocumentor/Reflection/DocBlock/Description.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/ReturnTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/VersionTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/SinceTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/ParamTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/AuthorTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/LinkTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/VarTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/ThrowsTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/SeeTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/UsesTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Type/Collection.php",
+    "/phpDocumentor/Reflection/DocBlock/Context.php",
 );
 
 
-
-foreach($codex_creator_docblock_include_arr as $cdx_inc){
-	require_once(WP_CODEX_ROOT_DOC.$cdx_inc);
+foreach ($codex_creator_docblock_include_arr as $cdx_inc) {
+    require_once(WP_CODEX_ROOT_DOC . $cdx_inc);
 }
 /*
 foreach (glob(WP_CODEX_ROOT_DOC."/phpDocumentor/Reflection/DocBlock/Tag/*.php") as $filename)
@@ -65,8 +70,6 @@ foreach (glob(WP_CODEX_ROOT_DOC."/phpDocumentor/Reflection/DocBlock/Tag/*.php") 
 	require_once $filename;
 }
 */
-
-
 
 
 /**

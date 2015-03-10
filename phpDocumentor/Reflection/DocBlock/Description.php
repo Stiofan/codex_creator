@@ -35,7 +35,7 @@ class Description implements \Reflector
     /**
      * Populates the fields of a description.
      *
-     * @param string   $content  The description's content.
+     * @param string $content The description's content.
      * @param DocBlock $docblock The DocBlock which this description belongs to.
      */
     public function __construct($content, DocBlock $docblock = null)
@@ -114,7 +114,7 @@ class Description implements \Reflector
             );
 
             $count = count($this->parsedContents);
-            for ($i=1; $i<$count; $i += 2) {
+            for ($i = 1; $i < $count; $i += 2) {
                 $this->parsedContents[$i] = Tag::createInstance(
                     $this->parsedContents[$i],
                     $this->docblock
@@ -124,7 +124,7 @@ class Description implements \Reflector
             //In order to allow "literal" inline tags, the otherwise invalid
             //sequence "{@}" is changed to "@", and "{}" is changed to "}".
             //See unit tests for examples.
-            for ($i=0; $i<$count; $i += 2) {
+            for ($i = 0; $i < $count; $i += 2) {
                 $this->parsedContents[$i] = str_replace(
                     array('{@}', '{}'),
                     array('@', '}'),

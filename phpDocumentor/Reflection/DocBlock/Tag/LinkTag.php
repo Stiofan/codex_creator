@@ -55,22 +55,22 @@ class LinkTag extends Tag
     }
 
     /**
-    * Gets the link
-    *
-    * @return string
-    */
+     * Gets the link
+     *
+     * @return string
+     */
     public function getLink()
     {
         return $this->link;
     }
 
     /**
-    * Sets the link
-    *
-    * @param string $link The link
-    *
-    * @return $this
-    */
+     * Sets the link
+     *
+     * @param string $link The link
+     *
+     * @return $this
+     */
     public function setLink($link)
     {
         $this->link = $link;

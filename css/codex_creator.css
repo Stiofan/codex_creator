@@ -1,3 +1,10 @@
+/**
+ * CSS for the backend
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
+
 .codex-creator-wrap {
     position: relative;
     overflow: auto;
@@ -59,6 +66,10 @@
 .codex-creator-step-2 .codex-creator-step-content .cc-plugin-theme-list {
     display: table-caption;
     margin-bottom: 3px;
+}
+
+.codex-creator-wrap .fa-exclamation-triangle {
+    color: #ff0000
 }
 
 /*
