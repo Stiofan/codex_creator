@@ -26,7 +26,13 @@ function codex_creator_get_type_list( $type ) {
 
 		echo "<ul>";
 		foreach ( $plugins as $name=>$plugin ) {
-			echo "<li data-plugin='".$name."' onclick=\"codex_creator_step_3('plugin','$name','".$plugin['Name']."');\">".$plugin['Name']."</li>";
+
+            $project = '';
+            if (codex_creator_has_codex( $plugin['Name'] )) {
+                $project = '<i class="fa fa-book" title="'.__('Project exists', WP_CODEX_TEXTDOMAIN ).'"></i> ';
+            }
+
+			echo "<li data-plugin='".$name."' onclick=\"codex_creator_step_3('plugin','$name','".$plugin['Name']."');\" class=\"cc-plugin-theme-list button button-primary\">".$project.$plugin['Name']."</li>";
 		}
 		echo "<ul>";
 
@@ -66,8 +72,6 @@ function codex_creator_scan() {
 
 
 	}
-	print_r( $_REQUEST );
-	//echo $wp_filesystem->get_contents($wp_filesystem->wp_plugins_dir().$_REQUEST['c_path']);
 	die();
 }
 // add function to ajax
@@ -561,26 +565,31 @@ function codex_creator_calc_project_posts(){
 add_action( 'wp_ajax_codex_creator_calc_project_posts', 'codex_creator_calc_project_posts' );
 
 
-function codex_creator_create_content(){
+function codex_creator_create_content_ajax(){
     global $wpdb;
     $project = $_REQUEST['c_name'];
     $count = $_REQUEST['count'];
+    $post_id = (isset($_REQUEST['post_id'])) ? $_REQUEST['post_id'] : '0';
 
 
     $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $project));
 
     if(! $term_id ){echo '0';exit;}
 
-    $posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d",$term_id));
+    //$posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d",$term_id));
+    codex_creator_codex_create_content($post_id);
+    $post_next = $wpdb->get_var($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d AND p.ID>%d ORDER BY p.ID ASC",$term_id,$post_id));
 
 
-    foreach ($posts as $p) {
+    /*foreach ($posts as $p) {
         codex_creator_codex_create_content($p->ID);
-    }
+    }*/
+
+    echo $post_next;
 
     die();
 }
-add_action( 'wp_ajax_codex_creator_create_content', 'codex_creator_create_content' );
+add_action( 'wp_ajax_codex_creator_create_content_ajax', 'codex_creator_create_content_ajax' );
 
 function codex_creator_suported_docblocks()
 {
@@ -606,6 +615,9 @@ function codex_creator_suported_docblocks()
         'type'         => __( 'Type', WP_CODEX_TEXTDOMAIN ),
         'uses'         => __( 'Uses', WP_CODEX_TEXTDOMAIN ),
         'var'          => __( 'Var', WP_CODEX_TEXTDOMAIN ),
+        'functions'    => __( 'Functions', WP_CODEX_TEXTDOMAIN ),//non standard
+        'location'  => __( 'Source Code', WP_CODEX_TEXTDOMAIN ),//non standard
+
 
     );
 

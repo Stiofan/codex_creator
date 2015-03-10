@@ -41,8 +41,8 @@ function codex_creator_main_page() {
 					<h3><?php _e( 'Step 1 - Plugin or Theme', WP_CODEX_TEXTDOMAIN ); ?></h3>
 				</div>
 				<div class="codex-creator-step-content ">
-					<span class="step-1-plugin" onclick="codex_creator_step_1('plugin');"><?php _e( 'Plugin', WP_CODEX_TEXTDOMAIN ); ?></span>
-					<span class="step-1-theme" onclick="codex_creator_step_1('theme');"><?php _e( 'Theme', WP_CODEX_TEXTDOMAIN ); ?></span>
+					<span class="step-1-plugin button button-primary" onclick="codex_creator_step_1('plugin');"><?php _e( 'Plugin', WP_CODEX_TEXTDOMAIN ); ?></span>
+					<span class="step-1-theme button button-primary" onclick="codex_creator_step_1('theme');"><?php _e( 'Theme', WP_CODEX_TEXTDOMAIN ); ?></span>
 				</div>
 			</div>
 

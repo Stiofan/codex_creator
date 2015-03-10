@@ -61,14 +61,17 @@ function codex_creator_status_text( $type, $el ) {
 		?>
 
 		<h4><?php _e( 'It looks like this project is already added, select an option below.', WP_CODEX_TEXTDOMAIN ); ?></h4>
-		<span onclick="codex_creator_sync_project_files('<?php echo $type;?>','<?php echo $el;?>');" class="cc-add-project-btn"><?php _e( 'Sync all files', WP_CODEX_TEXTDOMAIN ); ?></span>
+		<span onclick="codex_creator_sync_project_files('<?php echo $type;?>','<?php echo $el;?>');" class="cc-add-project-btn button button-primary"><?php _e( 'Sync all files', WP_CODEX_TEXTDOMAIN ); ?></span>
 
-	<?php
+        // @todo add tools such as add link to docblock to codex page, create basic docblocks for pages/functions
+        <h4><?php _e( 'Other tools to be added soon', WP_CODEX_TEXTDOMAIN ); ?></h4>
+
+    <?php
 
 	} else {?>
 
 		<h4><?php _e( 'It looks like this is a new project, please click below to add it.', WP_CODEX_TEXTDOMAIN ); ?></h4>
-		<span onclick="codex_creator_add_project('<?php echo $type;?>','<?php echo $el;?>');" class="cc-add-project-btn"><?php _e( 'Add new project', WP_CODEX_TEXTDOMAIN ); ?></span>
+		<span onclick="codex_creator_add_project('<?php echo $type;?>','<?php echo $el;?>');" class="cc-add-project-btn button button-primary"><?php _e( 'Add new project', WP_CODEX_TEXTDOMAIN ); ?></span>
 
 	<?php
 	}

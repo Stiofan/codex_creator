@@ -44,7 +44,7 @@ function codex_creator_get_step_2(cType) {
         },
         success:function(data) {
             jQuery('.codex-creator-step-2 .codex-creator-step-content').html(data);
-            console.log(data);
+            //console.log(data);
         },
         error: function(errorThrown){
             console.log(errorThrown);
@@ -75,7 +75,7 @@ function codex_creator_scan_files($type,$plugin,$name) {
         },
         success:function(data) {
             jQuery('.codex-creator-step-3 .codex-creator-step-content').html(data);
-            console.log(data);
+            //console.log(data);
         },
         error: function(errorThrown){
             console.log(errorThrown);
@@ -254,7 +254,10 @@ function codex_creator_calc_project_posts($type,$el){
             'c_name' : $el
         },
         success:function(data) {
-            if(data){codex_creator_create_codex_content($type,$el,data);}
+            if(data){
+                codex_creator_create_loading_bar_content(data);
+                codex_creator_create_codex_content($type,$el,data);
+            }
         },
         error: function(errorThrown){
             console.log(errorThrown);
@@ -263,21 +266,30 @@ function codex_creator_calc_project_posts($type,$el){
 
 }
 
-
-function codex_creator_create_codex_content($type,$el,$count){
+$cc_progress_count = 0;
+function codex_creator_create_codex_content($type,$el,$count,$post_id){
 
     // This does the ajax request
     jQuery.ajax({
         url: ajaxurl,
         data: {
-            'action':'codex_creator_create_content',
+            'action':'codex_creator_create_content_ajax',
             'c_type' : $type,
             'c_name' : $el,
-            'count'  : $count
+            'count'  : $count,
+            'post_id': $post_id
         },
         success:function(data) {
-            alert('done'+data);
-            console.log(data);
+            $cc_progress_count++;
+            //if a post id is returned then loop
+            if(data) {
+                console.log(data);
+                codex_creator_create_loading_bar_update($cc_progress_count);
+                codex_creator_create_codex_content($type, $el, $count, data);
+
+            }else{
+                alert('done');
+            }
 
 
         },
@@ -287,4 +299,38 @@ function codex_creator_create_codex_content($type,$el,$count){
     });
 
 }
+
+function codex_creator_create_loading_bar_content($count){
+
+    // @todo make this string translatable
+    loading_div = '<h4>Please wait while we cross reference each file/function and build the page content.</h4>'+
+    '<div class="cc-loading-div" data-count="'+$count+'">'+
+    '<div class="cc-loading-progress cc-loading-progress-striped cc-active"  style="width:0%">'+
+    '0%'+
+    '</div>'+
+    '</div>';
+
+    jQuery('.codex-creator-step-3 .codex-creator-step-content').html(loading_div);
+
+
+}
+
+function codex_creator_create_loading_bar_update($num){
+
+    $count = jQuery('.cc-loading-div').data("count");
+
+
+    $percent = $num/$count * 100;
+
+    jQuery('.cc-loading-div .cc-loading-progress').html($percent.toFixed(2)+'%');
+    jQuery('.cc-loading-div .cc-loading-progress').width($percent.toFixed(2)+'%');
+
+    if($num==$count){
+        jQuery('.cc-loading-div .cc-loading-progress').removeClass('cc-active');
+    }
+
+
+}
+
+
 

@@ -168,6 +168,7 @@ function codex_creator_since_content($post_id,$title){
     $content = '';
     $meta_value = get_post_meta($post_id, 'codex_creator_since',true);
     if(!$meta_value){return;}
+    if(is_array($meta_value) && empty($meta_value)){return false;}
     $content .= WP_CODEX_TITLE_START.$title.WP_CODEX_TITLE_END;
     $tags = array();
     $tags_set_arr = array();
@@ -189,7 +190,7 @@ function codex_creator_since_content($post_id,$title){
 
         }
     }else{
-        $content .= WP_CODEX_CONTENT_START.'<a href="%'.$value.'%">'.$value.'</a>'.WP_CODEX_CONTENT_END;
+        $content .= WP_CODEX_CONTENT_START.'<a href="%'.$meta_value.'%">'.$meta_value.'</a>'.WP_CODEX_CONTENT_END;
         $tags[]=$meta_value;
     }
 
@@ -277,4 +278,58 @@ function codex_creator_var_content($post_id,$title){
     $content .= WP_CODEX_CONTENT_START.$meta_value.WP_CODEX_CONTENT_END;
 
     return apply_filters('codex_creator_var_content',$content,$post_id,$title);
+}
+
+function codex_creator_functions_content($post_id,$title){
+    $content = '';
+    $meta_value = get_post_meta($post_id, 'codex_creator_meta_functions',true);
+    if(!$meta_value){return;}
+    $content .= WP_CODEX_TITLE_START.$title.WP_CODEX_TITLE_END;
+    //$content .= WP_CODEX_CONTENT_START.$meta_value.WP_CODEX_CONTENT_END;
+
+    if(is_array($meta_value)){
+        foreach ($meta_value as $func) {
+
+            $func_arr = get_page_by_title( $func[1], OBJECT, 'codex_creator' );
+
+           // print_r($func_arr);exit;
+
+            if(is_object($func_arr)){
+                $link = get_permalink( $func_arr->ID);
+                $content .= WP_CODEX_CONTENT_START.'<a href="'.$link.'">'.$func[1].'()</a> ['.__('Line', WP_CODEX_TEXTDOMAIN ).': '.$func[2].']'.WP_CODEX_CONTENT_END;
+            }else{
+                $content .= WP_CODEX_CONTENT_START.$func[1].'() ['.__('Line', WP_CODEX_TEXTDOMAIN ).': '.$func[2].']'.WP_CODEX_CONTENT_END;
+
+            }
+
+        }
+
+
+    }
+    //$content .= WP_CODEX_CONTENT_START.print_r($meta_value,true).WP_CODEX_CONTENT_END;
+
+    return apply_filters('codex_creator_functions_content',$content,$post_id,$title);
+}
+
+function codex_creator_location_content($post_id,$title){
+    $content = '';
+    $meta_value = get_post_meta($post_id, 'codex_creator_meta_path',true);
+    if(!$meta_value){return;}
+    $line = get_post_meta($post_id, 'codex_creator_meta_line',true);
+    $content .= WP_CODEX_TITLE_START.$title.WP_CODEX_TITLE_END;
+
+    $file_name = basename($meta_value);
+    $func_arr = get_post( $post_id );
+    $func_name = $func_arr->post_title;
+
+    $file_arr = get_page_by_title( $file_name, OBJECT, 'codex_creator' );
+    if(is_object($file_arr)){
+        $link = get_permalink( $file_arr->ID);
+        $content .= WP_CODEX_CONTENT_START.$func_name.'() '.__('is located in', WP_CODEX_TEXTDOMAIN ).' <a href="'.$link.'">'.$meta_value.'</a> ['.__('Line', WP_CODEX_TEXTDOMAIN ).': '.$line.']'.WP_CODEX_CONTENT_END;
+    }else{
+        $content .= WP_CODEX_CONTENT_START.$func_name.'() '.__('is located in', WP_CODEX_TEXTDOMAIN ).' '.$meta_value.' ['.__('Line', WP_CODEX_TEXTDOMAIN ).': '.$line.']'.WP_CODEX_CONTENT_END;
+    }
+
+
+    return apply_filters('codex_creator_location_content',$content,$post_id,$title);
 }

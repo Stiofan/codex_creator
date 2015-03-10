@@ -7,7 +7,9 @@
  */
 
 /**
- * Create our CPT
+ * Create our CPT and taxonomies.
+ *
+ * This function creates the custom post type, the project categories and also the version numbers as tags.
  *
  * @since 1.0.0
  * @package Codex Creator
@@ -110,8 +112,19 @@ add_action( 'init', 'cdxc_create_posttype' );
 add_filter('post_link', 'codex_creator_permalink', 1, 3);
 add_filter('post_type_link', 'codex_creator_permalink', 1, 3);
 
-function codex_creator_permalink($permalink, $post_id, $leavename) {
-	//con %brand% catturo il rewrite del Custom Post Type
+/**
+ * Rewrite the codex permalink to include the sub category name instead of the main category name
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @internal This is never called direct
+ *
+ * @param $permalink
+ * @param $post_id
+ * @return mixed
+ */
+function codex_creator_permalink($permalink, $post_id) {
+
 	if (strpos($permalink, '%codex_project%') === FALSE) return $permalink;
 	// Get post
 	$post = get_post($post_id);
