@@ -38,7 +38,7 @@ function cdxc_create_posttype() {
 		'public' => true,
 		'query_var' => true,
 		'rewrite' => array ('slug' => 'codex/%codex_project%', 'with_front' => false, 'hierarchical' => true),
-		'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'custom-fields', 'comments', 'revisions', /*'post-formats'*/ ),
+        //'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'custom-fields', 'comments', 'revisions', /*'post-formats'*/ ),
 		'taxonomies' => array('codex_category','codex_tags') );
 
 	register_post_type( 'codex_creator',$codex_defaults);
@@ -71,22 +71,22 @@ function cdxc_create_posttype() {
 
 	// Add new taxonomy, NOT hierarchical (like tags)
 	$labels = array(
-		'name'                       => _x( 'Tags', 'taxonomy general name' ),
-		'singular_name'              => _x( 'Tags', 'taxonomy singular name' ),
-		'search_items'               => __( 'Search Tags' ),
-		'popular_items'              => __( 'Popular Tags' ),
-		'all_items'                  => __( 'All Tags' ),
+		'name'                       => _x( 'Version', 'taxonomy general name' ),
+		'singular_name'              => _x( 'Versions', 'taxonomy singular name' ),
+		'search_items'               => __( 'Search Versions' ),
+		'popular_items'              => __( 'Popular Versions' ),
+		'all_items'                  => __( 'All Versions' ),
 		'parent_item'                => null,
 		'parent_item_colon'          => null,
-		'edit_item'                  => __( 'Edit Tag' ),
-		'update_item'                => __( 'Update Tag' ),
-		'add_new_item'               => __( 'Add New Tag' ),
-		'new_item_name'              => __( 'New Tag Name' ),
-		'separate_items_with_commas' => __( 'Separate tags with commas' ),
-		'add_or_remove_items'        => __( 'Add or remove tags' ),
-		'choose_from_most_used'      => __( 'Choose from the most used tags' ),
-		'not_found'                  => __( 'No tags found.' ),
-		'menu_name'                  => __( 'Tags' ),
+		'edit_item'                  => __( 'Edit Version' ),
+		'update_item'                => __( 'Update Version' ),
+		'add_new_item'               => __( 'Add New Version' ),
+		'new_item_name'              => __( 'New Version Name' ),
+		'separate_items_with_commas' => __( 'Separate versions with commas' ),
+		'add_or_remove_items'        => __( 'Add or remove versions' ),
+		'choose_from_most_used'      => __( 'Choose from the most used versions' ),
+		'not_found'                  => __( 'No versions found.' ),
+		'menu_name'                  => __( 'Versions' ),
 	);
 
 	$args = array(
@@ -96,7 +96,7 @@ function cdxc_create_posttype() {
 		'show_admin_column'     => true,
 		'update_count_callback' => '_update_post_term_count',
 		'query_var'             => true,
-		'rewrite'               => array( 'slug' => 'codex_tag' ),
+		'rewrite'               => array( 'slug' => 'codex_version' ),
 	);
 
 	register_taxonomy( 'codex_tags', 'codex_creator', $args );
@@ -121,16 +121,22 @@ function codex_creator_permalink($permalink, $post_id, $leavename) {
 	$terms = wp_get_object_terms($post->ID, 'codex_project');
 	//print_r($terms);
     $taxonomy_slug = '';
+    //$type_slug = '';
 	if (!is_wp_error($terms) && !empty($terms) && is_object($terms[0])) {
 
         foreach($terms as $term){
-            if($term->parent=='0'){$taxonomy_slug = $term->slug;}
+            if($term->parent!='0'){$taxonomy_slug = $term->slug;}
+            //if($term->parent!='0'){$type_slug = $term->slug;}
         }
 	}
 
     if(!$taxonomy_slug){$taxonomy_slug = 'no-project';}
+  //  if(!$type_slug){$type_slug = 'no-type';}
 
     //$taxonomy_slug = 'cat1/cat2';
 
-	return str_replace('%codex_project%', $taxonomy_slug, $permalink);
+    $permalink =  str_replace('%codex_project%', $taxonomy_slug, $permalink);
+    //$permalink =  str_replace('%codex_type%', $type_slug, $permalink);
+
+	return $permalink;
 }

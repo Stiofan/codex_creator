@@ -24,6 +24,11 @@ define( 'WP_CODEX_ROOT_DOC', __DIR__ );
 define( 'WP_CODEX_TEXTDOMAIN', 'codex_creator' );
 define( 'WP_CODEX_URL', plugin_dir_url( WP_CODEX_ROOT ) );
 
+define( 'WP_CODEX_TITLE_START', "<h4>" );
+define( 'WP_CODEX_TITLE_END', "</h4>" );
+define( 'WP_CODEX_CONTENT_START', "<p>" );
+define( 'WP_CODEX_CONTENT_END', "</p>" );
+
 
 /**
  * DocBlock Class for reading DocBlocks
@@ -75,6 +80,10 @@ include_once('lib/setup_cpt.php');
 include_once('lib/setup_section.php');
 
 
+/**
+ * Codex Creator content output functions
+ */
+include_once('lib/content_output_functions.php');
 
 
 /**

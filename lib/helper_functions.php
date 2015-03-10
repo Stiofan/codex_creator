@@ -85,38 +85,30 @@ function codex_creator_is_allowed_file( $file ) {
 	return false;
 }
 
+
+
 function codex_creator_codex_create_content($post_id)
 {   global $wpdb;
-
     $docblocks = codex_creator_suported_docblocks();
     $content = '';
-    $title_start = "<h4>";
-    $title_end = "</h4>";
-    $content_start = "<p>";
-    $content_end = "</p>";
+
     foreach ($docblocks as $key=>$title) {
-        $meta_value = '';
-        $meta_value = get_post_meta($post_id, 'codex_creator_'.$key,true);
-        if(!$meta_value){continue;}
 
-        if($key=='internal'){
-            $content .= $title_start.$title.$title_end;
-            $content .= $content_start.$meta_value.$content_end;
-        }
-        else{
-            $content .= $title_start.$title.$title_end;
-            $content .= $content_start.$meta_value.$content_end;
-        }
-
-
-
-
-
+        $content .= call_user_func('codex_creator_'.$key.'_content',$post_id,$title);
 
     }
 
-    echo  $content;
+    //echo  $content;
 
+    $my_post = array(
+        'ID'           => $post_id,
+        'post_content' => $content
+    );
+
+    $return = wp_update_post( $my_post );
+    if( is_wp_error( $return ) ) {
+        echo $return->get_error_message();
+    }
 
 }
 //codex_creator_codex_create_content(1316);

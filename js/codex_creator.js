@@ -276,24 +276,10 @@ function codex_creator_create_codex_content($type,$el,$count){
             'count'  : $count
         },
         success:function(data) {
-            jQuery(this).data('sync',1);
+            alert('done'+data);
             console.log(data);
 
-            jQuery( cc_curent_sync_function ).css('background-color', 'red');
 
-            if (index === total_func - 1) {
-                // this is the last one
-
-                if($last){
-                    alert('done0');
-
-                }else {
-                    codex_creator_sync_project_files($type,$el);
-                }
-
-            }else {
-                codex_creator_sync_project_functions($type, $el, $file,$last);
-            }
         },
         error: function(errorThrown){
             console.log(errorThrown);
