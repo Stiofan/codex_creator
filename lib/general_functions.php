@@ -8,9 +8,14 @@
 
 
 /**
- * @param $type
+ * Outputs a list of installed plugins.
+ *
+ * Builds a unordered list of installed plugins for further use with ajax functions.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
  */
-function codex_creator_get_type_list($type)
+function codex_creator_get_type_list()
 {
     if (isset($_REQUEST['c_type']) && $_REQUEST['c_type'] == 'plugin') {
         //print_r(get_plugins());
@@ -38,7 +43,14 @@ function codex_creator_get_type_list($type)
 // add function to ajax
 add_action('wp_ajax_codex_creator_get_type_list', 'codex_creator_get_type_list');
 
-
+/**
+ * Outputs Step 3.
+ *
+ * Scans the selected plugin/theme, shows the document tree and further option buttons to be called via ajax.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
 function codex_creator_scan()
 {
     global $wp_filesystem;
@@ -59,7 +71,7 @@ function codex_creator_scan()
 
         }
 
-        // CHeck the status and display the apropriate actions
+        // Check the status and display the apropriate actions
         codex_creator_status_text($_REQUEST['c_type'], $_REQUEST['c_name']);
 
         $files = $wp_filesystem->dirlist($path, true, true);
@@ -74,7 +86,17 @@ function codex_creator_scan()
 // add function to ajax
 add_action('wp_ajax_codex_creator_scan', 'codex_creator_scan');
 
-
+/**
+ * Build the file/folder tree for step 3.
+ *
+ * Scans through the selected plugin/theme and builds the actual folder/file tree for use in step 3 by further ajax functions.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param array $files An array of file and folders.
+ * @param string $path Optional. The absolute file path to the plugin/theme being scanned.
+ * @param string $folder Optional. A folder base path for files in the $files array.
+ */
 function codex_creator_scan_output($files, $path, $folder = '')
 {
     echo "<ul class='cc-file-tree'>";
@@ -132,22 +154,9 @@ function codex_creator_scan_output($files, $path, $folder = '')
 
 }
 
-
-function codex_creator_get_file_header($out)
-{
-    if (empty($out)) {
-        return false;
-    }
-
-    //$file_header = get_file_data( $file, $default_headers, $context = '' )
-}
-
-
-function codex_creator_output_file($file)
-{
-
-}
-
+/**
+ * @return bool|string
+ */
 function codex_creator_init_filesystem()
 {
     $access_type = get_filesystem_method();
@@ -666,18 +675,18 @@ function codex_creator_suported_docblocks()
         'link' => __('Link', WP_CODEX_TEXTDOMAIN),
         'method' => __('Method', WP_CODEX_TEXTDOMAIN),
         'package' => __('Package', WP_CODEX_TEXTDOMAIN),
-        'param' => __('Params', WP_CODEX_TEXTDOMAIN),
+        'param' => __('Parameters', WP_CODEX_TEXTDOMAIN),
         'example' => __('Example', WP_CODEX_TEXTDOMAIN),//non standard
-        'return' => __('Returns', WP_CODEX_TEXTDOMAIN),
+        'return' => __('Return Values', WP_CODEX_TEXTDOMAIN),
         'see' => __('See', WP_CODEX_TEXTDOMAIN),
-        'since' => __('Since', WP_CODEX_TEXTDOMAIN),
+        'since' => __('Change Log', WP_CODEX_TEXTDOMAIN),
         'subpackage' => __('Subpackage', WP_CODEX_TEXTDOMAIN),
         'todo' => __('Todo', WP_CODEX_TEXTDOMAIN),
         'type' => __('Type', WP_CODEX_TEXTDOMAIN),
         'uses' => __('Uses', WP_CODEX_TEXTDOMAIN),
         'var' => __('Var', WP_CODEX_TEXTDOMAIN),
         'functions' => __('Functions', WP_CODEX_TEXTDOMAIN),//non standard
-        'location' => __('Source Code', WP_CODEX_TEXTDOMAIN),//non standard
+        'location' => __('Source File', WP_CODEX_TEXTDOMAIN),//non standard
 
 
     );

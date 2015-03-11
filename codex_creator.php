@@ -36,6 +36,10 @@ define('WP_CODEX_TITLE_END', "</h4>");
 define('WP_CODEX_CONTENT_START', "<p>");
 define('WP_CODEX_CONTENT_END', "</p>");
 
+define('WP_CODEX_SAMPLE_OPEN', "<pre>");
+define('WP_CODEX_SAMPLE_CLOSE', "</pre>");
+
+
 
 /**
  * DocBlock Class for reading DocBlocks

@@ -6,6 +6,15 @@
  * @package Codex Creator
  */
 
+/**
+ * Get and format content output for summary section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_summary_content($post_id, $title)
 {
     $content = '';
@@ -19,20 +28,70 @@ function codex_creator_summary_content($post_id, $title)
     return apply_filters('codex_creator_summary_content', $content, $post_id, $title);
 }
 
-
+/**
+ * Get and format content output for description section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_description_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_description', true);
+    //$meta_value = get_post_meta($post_id, 'codex_creator_description', true);
+    $meta_value = get_post_meta($post_id, 'codex_creator_meta_docblock', true);
     if (!$meta_value) {
-        return;
+        return '';
     }
+
+    $phpdoc = new \phpDocumentor\Reflection\DocBlock($meta_value);
+
+    $line_arr = explode(PHP_EOL, $phpdoc->getLongDescription()->getContents());
+    $line_arr = array_values(array_filter($line_arr));
+
+    if (empty($line_arr)) {
+        return '';
+    }
+    $sample_open = false;
+    $sample_close = false;
+    foreach ($line_arr as $key=>$line) {
+
+        //check for code sample opening
+        if($line=='' && substr($line_arr[$key+1], 0, 3) === '   '){// we have found a opening code sample
+            $sample_open = $key+1;
+        }
+
+        //check for code sample closing
+        if($sample_open && substr($line_arr[$key], 0, 3) === '   '){// we have found a closing code sample
+            $sample_close = $key;
+        }
+
+    }
+
+    if ($sample_open && $sample_close) {
+        $line_arr[$sample_open] = WP_CODEX_SAMPLE_OPEN.$line_arr[$sample_open];
+        $line_arr[$sample_open] = $line_arr[$sample_close].WP_CODEX_SAMPLE_CLOSE;
+    }
+
+    $meta_value = implode(PHP_EOL, $line_arr);
+
     $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
     $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
 
     return apply_filters('codex_creator_description_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for usage section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_usage_content($post_id, $title)
 {
     $content = '';
@@ -46,6 +105,15 @@ function codex_creator_usage_content($post_id, $title)
     return apply_filters('codex_creator_usage_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for access section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_access_content($post_id, $title)
 {
     $content = '';
@@ -59,6 +127,15 @@ function codex_creator_access_content($post_id, $title)
     return apply_filters('codex_creator_access_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for deprecated section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_deprecated_content($post_id, $title)
 {
     $content = '';
@@ -72,6 +149,15 @@ function codex_creator_deprecated_content($post_id, $title)
     return apply_filters('codex_creator_deprecated_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for global section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_global_content($post_id, $title)
 {
     $content = '';
@@ -92,6 +178,15 @@ function codex_creator_global_content($post_id, $title)
     return apply_filters('codex_creator_global_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for internal section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_internal_content($post_id, $title)
 {
     $content = '';
@@ -105,6 +200,15 @@ function codex_creator_internal_content($post_id, $title)
     return apply_filters('codex_creator_internal_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for ignore section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_ignore_content($post_id, $title)
 {
     $content = '';
@@ -118,6 +222,15 @@ function codex_creator_ignore_content($post_id, $title)
     return apply_filters('codex_creator_ignore_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for link section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_link_content($post_id, $title)
 {
     $content = '';
@@ -131,6 +244,15 @@ function codex_creator_link_content($post_id, $title)
     return apply_filters('codex_creator_link_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for method section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_method_content($post_id, $title)
 {
     $content = '';
@@ -144,6 +266,15 @@ function codex_creator_method_content($post_id, $title)
     return apply_filters('codex_creator_method_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for package section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_package_content($post_id, $title)
 {
     $content = '';
@@ -157,6 +288,15 @@ function codex_creator_package_content($post_id, $title)
     return apply_filters('codex_creator_package_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for param section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_param_content($post_id, $title)
 {
     $content = '';
@@ -167,15 +307,113 @@ function codex_creator_param_content($post_id, $title)
     $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
     if (is_array($meta_value)) {
         foreach ($meta_value as $value) {
+            $value = codex_creator_param_content_helper($value);
             $content .= WP_CODEX_CONTENT_START . $value . WP_CODEX_CONTENT_END;
         }
     } else {
+        $meta_value = codex_creator_param_content_helper($meta_value);
         $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
     }
 
     return apply_filters('codex_creator_param_content', $content, $post_id, $title);
 }
 
+/**
+ * Arrange a param value into a usable HTML output.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $param The param value to be used.
+ * @return string Formatted HTML on success.
+ */
+function codex_creator_param_content_helper($param)
+{   if($param==''){return '';}
+    $output = '';
+    $param_arr = explode(' ',$param);
+    $param_arr = array_values(array_filter($param_arr));
+    //print_r($param_arr);
+
+    $output .= '<dl>';
+    //variable
+    if(!empty($param_arr[1])){
+        $var = $param_arr[1];
+        $output .= '<dt><b>'.$var.'</b></dt>';
+        unset($param_arr[1]);
+    }
+
+    $output .= '<dd>';
+    //datatype
+    if(!empty($param_arr[0])){
+        $datatype = $param_arr[0];
+        $link_open = '';
+        $link_close = '';
+        if($datatype=='string' || $datatype=='String'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#String" target="_blank">';
+            $link_close = '</a>';
+        }
+        if($datatype=='int'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#Integer" target="_blank">';
+            $link_close = '</a>';
+        }
+        if($datatype=='bool'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#Boolean" target="_blank">';
+            $link_close = '</a>';
+        }
+
+        $output .= '('.$link_open.'<i>'.$datatype.'</i>'.$link_close.') ';
+        unset($param_arr[0]);
+
+    }
+
+
+
+    //optional
+    $optional = '(<i>'.__('required', WP_CODEX_TEXTDOMAIN).'</i>)';
+    if(!empty($param_arr[2])){
+        $opt = $param_arr[2];
+        if($opt=='Optional.' || $opt=='optional.'){
+            $optional = '(<i>'.__('optional', WP_CODEX_TEXTDOMAIN).'</i>)';
+            unset($param_arr[2]);
+        }
+    }
+    $output .= $optional.' ';
+
+    //we now split into descriptions.
+    $param_str = implode(' ',$param_arr);
+    $param_arr = explode('.',$param_str);
+    $param_arr = array_filter($param_arr);
+    //print_r($param_arr);
+
+    //description/default
+    $default = '<dl><dd>'.__('Default', WP_CODEX_TEXTDOMAIN).': <i>'.__('None', WP_CODEX_TEXTDOMAIN).'</i></dd></dl>';
+    foreach ($param_arr as $bit) {
+        $bit = trim($bit);
+        //echo '#'.$bit.'#';
+        if(substr( $bit, 0, 7) === 'Default'){
+            $bits = explode('Default',$bit);
+            $default = '<dl><dd>'.__('Default', WP_CODEX_TEXTDOMAIN).': <i>'.$bits[1].'</i></dd></dl>';
+
+        }else{
+            $output .= $bit.'. ';
+        }
+    }
+
+    $output .= $default;
+
+    $output .= '</dd>';
+    $output .= '</dl>';
+    return $output;
+}
+
+/**
+ * Get and format content output for example section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_example_content($post_id, $title)
 {
     $content = '';
@@ -189,6 +427,15 @@ function codex_creator_example_content($post_id, $title)
     return apply_filters('codex_creator_example_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for return section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_return_content($post_id, $title)
 {
     $content = '';
@@ -197,11 +444,87 @@ function codex_creator_return_content($post_id, $title)
         return;
     }
     $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
+    $meta_value = codex_creator_return_content_helper($meta_value);
     $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
 
     return apply_filters('codex_creator_return_content', $content, $post_id, $title);
 }
 
+/**
+ * Arrange a return value into a usable HTML output.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $value The string value to be used.
+ * @return string Formatted HTML on success.
+ */
+function codex_creator_return_content_helper($value)
+{
+    if($value==''){return '';}
+    $output = '';
+    $param_arr = explode(' ',$value);
+    $param_arr = array_values(array_filter($param_arr));
+    //print_r($param_arr);
+
+    $output .= '<dl>';
+
+
+
+    //datatype
+    if(!empty($param_arr[0])){
+        $datatype = $param_arr[0];
+        $link_open = '';
+        $link_close = '';
+        if($datatype=='string' || $datatype=='String'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#String" target="_blank">';
+            $link_close = '</a>';
+        }
+        if($datatype=='int'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#Integer" target="_blank">';
+            $link_close = '</a>';
+        }
+        if($datatype=='bool'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#Boolean" target="_blank">';
+            $link_close = '</a>';
+        }
+
+        $output .= '<dt><b>('.$link_open.'<i>'.$datatype.'</i>'.$link_close.')</b></dt>';
+        unset($param_arr[0]);
+
+    }
+
+
+    $output .= '<ul>';
+
+    //we now split into descriptions.
+    $param_str = implode(' ',$param_arr);
+    $param_arr = explode('.',$param_str);
+    $param_arr = array_filter($param_arr);
+    //print_r($param_arr);
+
+    //description/default
+    foreach ($param_arr as $bit) {
+        $bit = trim($bit);
+
+            $output .= '<li>'.$bit.'. </li>';
+
+    }
+
+    $output .= '</ul>';
+    $output .= '</dl>';
+
+    return $output;
+}
+
+/**
+ * Get and format content output for see section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_see_content($post_id, $title)
 {
     $content = '';
@@ -215,6 +538,15 @@ function codex_creator_see_content($post_id, $title)
     return apply_filters('codex_creator_see_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for since section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_since_content($post_id, $title)
 {
     $content = '';
@@ -227,25 +559,27 @@ function codex_creator_since_content($post_id, $title)
     }
     $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
     $tags = array();
-    $tags_set_arr = array();
     if (is_array($meta_value)) {
+        $i=0;
         foreach ($meta_value as $value) {
+
+            if($i==0){$since = __('Since', WP_CODEX_TEXTDOMAIN).': ';}else{$since='';}
 
             if ($pieces = explode(" ", $value)) {
                 $ver = $pieces[0];
                 unset($pieces[0]);
                 $text = join(' ', $pieces);
-                $content .= WP_CODEX_CONTENT_START . '<a href="%' . $ver . '%">' . $ver . '</a>' . ' ' . $text . WP_CODEX_CONTENT_END;
+                $content .= WP_CODEX_CONTENT_START .$since. '<a href="%' . $ver . '%">' . $ver . '</a>' . ' ' . $text . WP_CODEX_CONTENT_END;
                 $tags[] = $ver;
             } else {
                 $content .= WP_CODEX_CONTENT_START . '<a href="%' . $value . '%">' . $value . '</a>' . WP_CODEX_CONTENT_END;
                 $tags[] = $value;
             }
-
+            $i++;
 
         }
     } else {
-        $content .= WP_CODEX_CONTENT_START . '<a href="%' . $meta_value . '%">' . $meta_value . '</a>' . WP_CODEX_CONTENT_END;
+        $content .= WP_CODEX_CONTENT_START .__('Since', WP_CODEX_TEXTDOMAIN). ': <a href="%' . $meta_value . '%">' . $meta_value . '</a>' . WP_CODEX_CONTENT_END;
         $tags[] = $meta_value;
     }
 
@@ -287,6 +621,15 @@ function codex_creator_since_content($post_id, $title)
     return apply_filters('codex_creator_since_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for subpackage section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_subpackage_content($post_id, $title)
 {
     $content = '';
@@ -300,6 +643,15 @@ function codex_creator_subpackage_content($post_id, $title)
     return apply_filters('codex_creator_subpackage_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for todo section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_todo_content($post_id, $title)
 {
     $content = '';
@@ -313,6 +665,15 @@ function codex_creator_todo_content($post_id, $title)
     return apply_filters('codex_creator_todo_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for type section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_type_content($post_id, $title)
 {
     $content = '';
@@ -326,6 +687,15 @@ function codex_creator_type_content($post_id, $title)
     return apply_filters('codex_creator_type_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for uses section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_uses_content($post_id, $title)
 {
     $content = '';
@@ -339,6 +709,15 @@ function codex_creator_uses_content($post_id, $title)
     return apply_filters('codex_creator_uses_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for var section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_var_content($post_id, $title)
 {
     $content = '';
@@ -352,6 +731,15 @@ function codex_creator_var_content($post_id, $title)
     return apply_filters('codex_creator_var_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for functions section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_functions_content($post_id, $title)
 {
     $content = '';
@@ -386,6 +774,15 @@ function codex_creator_functions_content($post_id, $title)
     return apply_filters('codex_creator_functions_content', $content, $post_id, $title);
 }
 
+/**
+ * Get and format content output for location section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function codex_creator_location_content($post_id, $title)
 {
     $content = '';

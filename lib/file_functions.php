@@ -6,12 +6,25 @@
  * @package Codex Creator
  */
 
+/**
+ * Returns an array of allowed file types.
+ * @since 1.0.0
+ * @package Codex Creator
+ * @return array An array of allowed file types.
+ */
 function codex_creator_allowed_file_types()
 {
     return array('php', 'js', 'css',);
 }
 
-
+/**
+ * Get the contents of a file on the server as a variable.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $file The absolute path of the file.
+ * @return mixed The contents of the file if successful. False on failure.
+ */
 function codex_creator_get_file($file)
 {
     global $wp_filesystem;
@@ -21,6 +34,14 @@ function codex_creator_get_file($file)
     return $wp_filesystem->get_contents($file);
 }
 
+/**
+ * Get the contents of a file on the server as an array of file lines.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $file The absolute path of the file.
+ * @return mixed The contents of the file as an array if successful. False on failure.
+ */
 function codex_creator_get_file_array($file)
 {
     global $wp_filesystem;
@@ -30,7 +51,14 @@ function codex_creator_get_file_array($file)
     return $wp_filesystem->get_contents_array($file);
 }
 
-
+/**
+ * Check if a file has a DocBlock and if so return it.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $file_path The absolute path of the file.
+ * @return bool|string The DocBlock if successful. False on failure.
+ */
 function codex_creator_has_file_docblock($file_path)
 {
     global $wp_filesystem;
@@ -44,14 +72,20 @@ function codex_creator_has_file_docblock($file_path)
         return false;
     }
 
-    //echo $files_output;
-    //print_r($files_output);
-    //$phpdoc = new \phpDocumentor\Reflection\DocBlock($files_output );
-
-    //echo $phpdoc->getShortDescription().'###';
-
 }
 
+/**
+ * Reads a file for function names and DocBlocks.
+ *
+ * Returns an array containing the function DocBlock, function name and the file line number where the function starts.
+ *
+ *    array('DOCBLOCK_CONTENT','FUNCTION_NAME','FUNCTION_LINE_NUMBER');
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $file_path The absolute path of the file.
+ * @return array|bool The array of DocBlock info if successful. False if no functions present in file.
+ */
 function codex_creator_get_file_functions_arr($file)
 {
     $file_output = codex_creator_get_file($file);
@@ -100,16 +134,22 @@ function codex_creator_get_file_functions_arr($file)
     }
 }
 
+/**
+ * Outputs a unordered list of functions from a file for further use by ajax functions.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $file_path The absolute path of the file.
+ */
 function codex_creator_get_file_functions($file)
 {
-
     $func_arr = codex_creator_get_file_functions_arr($file);
 
     if (!empty($func_arr)) {
         echo '<ul class="cc-function-tree">';
         foreach ($func_arr as $fnc_name) {
             if (!empty($fnc_name[0])) {
-                $func_info = '';//'<i class="fa fa-exclamation-triangle" title="'.__( 'Function does not contain a DocBlock', WP_CODEX_TEXTDOMAIN ).'"></i>';
+                $func_info = '';
             } else {
                 $func_info = '<i class="fa fa-exclamation-triangle" title="' . __('Function does not contain a DocBlock', WP_CODEX_TEXTDOMAIN) . '"></i>';
             }
@@ -120,14 +160,16 @@ function codex_creator_get_file_functions($file)
         echo '</ul>';
     }
 
-
-    /*foreach ( $file_output as $line ) {
-        if (strpos($line,'are') !== false) {
-    }*/
-
 }
 
-
+/**
+ * Read and return the file DocBlock from a file.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param array $lines A array of lines from a file.
+ * @return bool|string Returns a string of the DocBlock on success. False if no DocBlock.
+ */
 function codex_creator_get_file_docblock($lines)
 {
     if (empty($lines)) {
@@ -135,7 +177,7 @@ function codex_creator_get_file_docblock($lines)
     }
 
     $i = 0;
-    $start = '';
+    $start = false;
     $end = '';
     $docblock = '';
 
@@ -161,7 +203,7 @@ function codex_creator_get_file_docblock($lines)
         }
     }
 
-    if ($start && $end) {
+    if ($start!==false && $end) {
 
         while ($start <= $end) {
             $docblock .= $lines[$start];
