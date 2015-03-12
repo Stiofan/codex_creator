@@ -43,7 +43,7 @@ function cdxc_create_posttype()
         'rewrite' => array('slug' => 'codex/%codex_project%', 'with_front' => false, 'hierarchical' => true),
         //'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'custom-fields', 'comments', 'revisions', /*'post-formats'*/ ),
         'supports' => array( 'title', 'comments', 'revisions', /*'post-formats'*/ ),
-        'taxonomies' => array('codex_category', 'codex_tags'));
+        'taxonomies' => array('codex_project', 'codex_tags'));
 
     register_post_type('codex_creator', $codex_defaults);
 

@@ -19,10 +19,12 @@ Author URI: http://www.nomaddevs.com/
 /*
  * For testing only, should be removed for release.
  * @todo remove this for release.
- */
+ *
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(-1);
+*/
+
 
 if (!defined('ABSPATH')) exit;
 
@@ -68,6 +70,12 @@ $cdxc_docblock_include_arr = array(
     "/phpDocumentor/Reflection/DocBlock/Tag/UsesTag.php",
     "/phpDocumentor/Reflection/DocBlock/Type/Collection.php",
     "/phpDocumentor/Reflection/DocBlock/Context.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/DeprecatedTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/MethodTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/PropertyTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/SourceTag.php",
+    "/phpDocumentor/Reflection/DocBlock/Tag/ExampleTag.php",
+
 );
 
 

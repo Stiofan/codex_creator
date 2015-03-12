@@ -602,16 +602,18 @@ function cdxc_since_content($post_id, $title)
     }
     $tags = $alt_tags;
 
-
     $tags_arr = wp_set_post_terms($post_id, $tags, 'codex_tags', false);
 
-    //print_r($tags);exit;
+    //print_r($tags_arr);//exit;
 
     if (is_array($tags_arr)) {
         foreach ($tags_arr as $key => $tag_id) {
-            $term = get_term($tag_id, 'codex_tags');
+            //$term = get_term($tag_id, 'codex_tags');
+            $term = get_term_by('term_taxonomy_id', $tag_id, 'codex_tags');
+
             $tag_link = get_term_link($term, 'codex_tags');
             $orig_ver = str_replace($project_slug . '_', '', $tags[$key]);
+
             $content = str_replace('%' . $orig_ver . '%', $tag_link, $content);
         }
     }

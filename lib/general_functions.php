@@ -285,6 +285,7 @@ function cdxc_sync_file()
 
     $phpdoc = false;
     //get the docblock and skip file if set to ignore
+
     $docblock = cdxc_has_file_docblock($file_loc);
     if ($docblock) {
 
