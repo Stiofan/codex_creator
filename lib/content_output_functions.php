@@ -15,17 +15,17 @@
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_summary_content($post_id, $title)
+function cdxc_summary_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_summary', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_summary', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_summary_content', $content, $post_id, $title);
+    return apply_filters('cdxc_summary_content', $content, $post_id, $title);
 }
 
 /**
@@ -37,11 +37,11 @@ function codex_creator_summary_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_description_content($post_id, $title)
+function cdxc_description_content($post_id, $title)
 {
     $content = '';
-    //$meta_value = get_post_meta($post_id, 'codex_creator_description', true);
-    $meta_value = get_post_meta($post_id, 'codex_creator_meta_docblock', true);
+    //$meta_value = get_post_meta($post_id, 'cdxc_description', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_docblock', true);
     if (!$meta_value) {
         return '';
     }
@@ -71,16 +71,16 @@ function codex_creator_description_content($post_id, $title)
     }
 
     if ($sample_open && $sample_close) {
-        $line_arr[$sample_open] = WP_CODEX_SAMPLE_OPEN.$line_arr[$sample_open];
-        $line_arr[$sample_open] = $line_arr[$sample_close].WP_CODEX_SAMPLE_CLOSE;
+        $line_arr[$sample_open] = CDXC_SAMPLE_OPEN.$line_arr[$sample_open];
+        $line_arr[$sample_open] = $line_arr[$sample_close].CDXC_SAMPLE_CLOSE;
     }
 
     $meta_value = implode(PHP_EOL, $line_arr);
 
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_description_content', $content, $post_id, $title);
+    return apply_filters('cdxc_description_content', $content, $post_id, $title);
 }
 
 /**
@@ -92,17 +92,17 @@ function codex_creator_description_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_usage_content($post_id, $title)
+function cdxc_usage_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_usage', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_usage', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_usage_content', $content, $post_id, $title);
+    return apply_filters('cdxc_usage_content', $content, $post_id, $title);
 }
 
 /**
@@ -114,17 +114,17 @@ function codex_creator_usage_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_access_content($post_id, $title)
+function cdxc_access_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_access', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_access', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_access_content', $content, $post_id, $title);
+    return apply_filters('cdxc_access_content', $content, $post_id, $title);
 }
 
 /**
@@ -136,17 +136,17 @@ function codex_creator_access_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_deprecated_content($post_id, $title)
+function cdxc_deprecated_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_deprecated', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_deprecated', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_deprecated_content', $content, $post_id, $title);
+    return apply_filters('cdxc_deprecated_content', $content, $post_id, $title);
 }
 
 /**
@@ -158,24 +158,24 @@ function codex_creator_deprecated_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_global_content($post_id, $title)
+function cdxc_global_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_global', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_global', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     if (is_array($meta_value)) {
         foreach ($meta_value as $value) {
-            $content .= WP_CODEX_CONTENT_START . $value . WP_CODEX_CONTENT_END;
+            $content .= CDXC_CONTENT_START . $value . CDXC_CONTENT_END;
         }
     } else {
-        $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+        $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
     }
 
 
-    return apply_filters('codex_creator_global_content', $content, $post_id, $title);
+    return apply_filters('cdxc_global_content', $content, $post_id, $title);
 }
 
 /**
@@ -187,17 +187,17 @@ function codex_creator_global_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_internal_content($post_id, $title)
+function cdxc_internal_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_internal', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_internal', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_internal_content', $content, $post_id, $title);
+    return apply_filters('cdxc_internal_content', $content, $post_id, $title);
 }
 
 /**
@@ -209,17 +209,17 @@ function codex_creator_internal_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_ignore_content($post_id, $title)
+function cdxc_ignore_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_ignore', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_ignore', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_ignore_content', $content, $post_id, $title);
+    return apply_filters('cdxc_ignore_content', $content, $post_id, $title);
 }
 
 /**
@@ -231,17 +231,17 @@ function codex_creator_ignore_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_link_content($post_id, $title)
+function cdxc_link_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_link', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_link', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_link_content', $content, $post_id, $title);
+    return apply_filters('cdxc_link_content', $content, $post_id, $title);
 }
 
 /**
@@ -253,17 +253,17 @@ function codex_creator_link_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_method_content($post_id, $title)
+function cdxc_method_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_method', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_method', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_method_content', $content, $post_id, $title);
+    return apply_filters('cdxc_method_content', $content, $post_id, $title);
 }
 
 /**
@@ -275,17 +275,17 @@ function codex_creator_method_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_package_content($post_id, $title)
+function cdxc_package_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_package', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_package', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_package_content', $content, $post_id, $title);
+    return apply_filters('cdxc_package_content', $content, $post_id, $title);
 }
 
 /**
@@ -297,25 +297,25 @@ function codex_creator_package_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_param_content($post_id, $title)
+function cdxc_param_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_param', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_param', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     if (is_array($meta_value)) {
         foreach ($meta_value as $value) {
-            $value = codex_creator_param_content_helper($value);
-            $content .= WP_CODEX_CONTENT_START . $value . WP_CODEX_CONTENT_END;
+            $value = cdxc_param_content_helper($value);
+            $content .= CDXC_CONTENT_START . $value . CDXC_CONTENT_END;
         }
     } else {
-        $meta_value = codex_creator_param_content_helper($meta_value);
-        $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+        $meta_value = cdxc_param_content_helper($meta_value);
+        $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
     }
 
-    return apply_filters('codex_creator_param_content', $content, $post_id, $title);
+    return apply_filters('cdxc_param_content', $content, $post_id, $title);
 }
 
 /**
@@ -326,7 +326,7 @@ function codex_creator_param_content($post_id, $title)
  * @param string $param The param value to be used.
  * @return string Formatted HTML on success.
  */
-function codex_creator_param_content_helper($param)
+function cdxc_param_content_helper($param)
 {   if($param==''){return '';}
     $output = '';
     $param_arr = explode(' ',$param);
@@ -368,11 +368,11 @@ function codex_creator_param_content_helper($param)
 
 
     //optional
-    $optional = '(<i>'.__('required', WP_CODEX_TEXTDOMAIN).'</i>)';
+    $optional = '(<i>'.__('required', CDXC_TEXTDOMAIN).'</i>)';
     if(!empty($param_arr[2])){
         $opt = $param_arr[2];
         if($opt=='Optional.' || $opt=='optional.'){
-            $optional = '(<i>'.__('optional', WP_CODEX_TEXTDOMAIN).'</i>)';
+            $optional = '(<i>'.__('optional', CDXC_TEXTDOMAIN).'</i>)';
             unset($param_arr[2]);
         }
     }
@@ -385,13 +385,13 @@ function codex_creator_param_content_helper($param)
     //print_r($param_arr);
 
     //description/default
-    $default = '<dl><dd>'.__('Default', WP_CODEX_TEXTDOMAIN).': <i>'.__('None', WP_CODEX_TEXTDOMAIN).'</i></dd></dl>';
+    $default = '<dl><dd>'.__('Default', CDXC_TEXTDOMAIN).': <i>'.__('None', CDXC_TEXTDOMAIN).'</i></dd></dl>';
     foreach ($param_arr as $bit) {
         $bit = trim($bit);
         //echo '#'.$bit.'#';
         if(substr( $bit, 0, 7) === 'Default'){
             $bits = explode('Default',$bit);
-            $default = '<dl><dd>'.__('Default', WP_CODEX_TEXTDOMAIN).': <i>'.$bits[1].'</i></dd></dl>';
+            $default = '<dl><dd>'.__('Default', CDXC_TEXTDOMAIN).': <i>'.$bits[1].'</i></dd></dl>';
 
         }else{
             $output .= $bit.'. ';
@@ -414,17 +414,17 @@ function codex_creator_param_content_helper($param)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_example_content($post_id, $title)
+function cdxc_example_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_example', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_example', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_example_content', $content, $post_id, $title);
+    return apply_filters('cdxc_example_content', $content, $post_id, $title);
 }
 
 /**
@@ -436,18 +436,18 @@ function codex_creator_example_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_return_content($post_id, $title)
+function cdxc_return_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_return', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_return', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $meta_value = codex_creator_return_content_helper($meta_value);
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $meta_value = cdxc_return_content_helper($meta_value);
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_return_content', $content, $post_id, $title);
+    return apply_filters('cdxc_return_content', $content, $post_id, $title);
 }
 
 /**
@@ -458,7 +458,7 @@ function codex_creator_return_content($post_id, $title)
  * @param string $value The string value to be used.
  * @return string Formatted HTML on success.
  */
-function codex_creator_return_content_helper($value)
+function cdxc_return_content_helper($value)
 {
     if($value==''){return '';}
     $output = '';
@@ -525,17 +525,17 @@ function codex_creator_return_content_helper($value)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_see_content($post_id, $title)
+function cdxc_see_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_see', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_see', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_see_content', $content, $post_id, $title);
+    return apply_filters('cdxc_see_content', $content, $post_id, $title);
 }
 
 /**
@@ -547,39 +547,39 @@ function codex_creator_see_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_since_content($post_id, $title)
+function cdxc_since_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_since', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_since', true);
     if (!$meta_value) {
         return;
     }
     if (is_array($meta_value) && empty($meta_value)) {
         return false;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $tags = array();
     if (is_array($meta_value)) {
         $i=0;
         foreach ($meta_value as $value) {
 
-            if($i==0){$since = __('Since', WP_CODEX_TEXTDOMAIN).': ';}else{$since='';}
+            if($i==0){$since = __('Since', CDXC_TEXTDOMAIN).': ';}else{$since='';}
 
             if ($pieces = explode(" ", $value)) {
                 $ver = $pieces[0];
                 unset($pieces[0]);
                 $text = join(' ', $pieces);
-                $content .= WP_CODEX_CONTENT_START .$since. '<a href="%' . $ver . '%">' . $ver . '</a>' . ' ' . $text . WP_CODEX_CONTENT_END;
+                $content .= CDXC_CONTENT_START .$since. '<a href="%' . $ver . '%">' . $ver . '</a>' . ' ' . $text . CDXC_CONTENT_END;
                 $tags[] = $ver;
             } else {
-                $content .= WP_CODEX_CONTENT_START . '<a href="%' . $value . '%">' . $value . '</a>' . WP_CODEX_CONTENT_END;
+                $content .= CDXC_CONTENT_START . '<a href="%' . $value . '%">' . $value . '</a>' . CDXC_CONTENT_END;
                 $tags[] = $value;
             }
             $i++;
 
         }
     } else {
-        $content .= WP_CODEX_CONTENT_START .__('Since', WP_CODEX_TEXTDOMAIN). ': <a href="%' . $meta_value . '%">' . $meta_value . '</a>' . WP_CODEX_CONTENT_END;
+        $content .= CDXC_CONTENT_START .__('Since', CDXC_TEXTDOMAIN). ': <a href="%' . $meta_value . '%">' . $meta_value . '</a>' . CDXC_CONTENT_END;
         $tags[] = $meta_value;
     }
 
@@ -618,7 +618,7 @@ function codex_creator_since_content($post_id, $title)
 
     // print_r($tags_arr);exit;
 
-    return apply_filters('codex_creator_since_content', $content, $post_id, $title);
+    return apply_filters('cdxc_since_content', $content, $post_id, $title);
 }
 
 /**
@@ -630,17 +630,17 @@ function codex_creator_since_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_subpackage_content($post_id, $title)
+function cdxc_subpackage_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_subpackage', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_subpackage', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_subpackage_content', $content, $post_id, $title);
+    return apply_filters('cdxc_subpackage_content', $content, $post_id, $title);
 }
 
 /**
@@ -652,17 +652,17 @@ function codex_creator_subpackage_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_todo_content($post_id, $title)
+function cdxc_todo_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_todo', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_todo', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_todo_content', $content, $post_id, $title);
+    return apply_filters('cdxc_todo_content', $content, $post_id, $title);
 }
 
 /**
@@ -674,17 +674,17 @@ function codex_creator_todo_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_type_content($post_id, $title)
+function cdxc_type_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_type', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_type', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_type_content', $content, $post_id, $title);
+    return apply_filters('cdxc_type_content', $content, $post_id, $title);
 }
 
 /**
@@ -696,17 +696,17 @@ function codex_creator_type_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_uses_content($post_id, $title)
+function cdxc_uses_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_uses', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_uses', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_uses_content', $content, $post_id, $title);
+    return apply_filters('cdxc_uses_content', $content, $post_id, $title);
 }
 
 /**
@@ -718,17 +718,17 @@ function codex_creator_uses_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_var_content($post_id, $title)
+function cdxc_var_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_var', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_var', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    $content .= WP_CODEX_CONTENT_START . $meta_value . WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_var_content', $content, $post_id, $title);
+    return apply_filters('cdxc_var_content', $content, $post_id, $title);
 }
 
 /**
@@ -740,15 +740,15 @@ function codex_creator_var_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_functions_content($post_id, $title)
+function cdxc_functions_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'codex_creator_meta_functions', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_functions', true);
     if (!$meta_value) {
         return;
     }
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
-    //$content .= WP_CODEX_CONTENT_START.$meta_value.WP_CODEX_CONTENT_END;
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    //$content .= CDXC_CONTENT_START.$meta_value.CDXC_CONTENT_END;
 
     if (is_array($meta_value)) {
         foreach ($meta_value as $func) {
@@ -759,9 +759,9 @@ function codex_creator_functions_content($post_id, $title)
 
             if (is_object($func_arr)) {
                 $link = get_permalink($func_arr->ID);
-                $content .= WP_CODEX_CONTENT_START . '<a href="' . $link . '">' . $func[1] . '()</a> [' . __('Line', WP_CODEX_TEXTDOMAIN) . ': ' . $func[2] . ']' . WP_CODEX_CONTENT_END;
+                $content .= CDXC_CONTENT_START . '<a href="' . $link . '">' . $func[1] . '()</a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
             } else {
-                $content .= WP_CODEX_CONTENT_START . $func[1] . '() [' . __('Line', WP_CODEX_TEXTDOMAIN) . ': ' . $func[2] . ']' . WP_CODEX_CONTENT_END;
+                $content .= CDXC_CONTENT_START . $func[1] . '() [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
 
             }
 
@@ -769,9 +769,9 @@ function codex_creator_functions_content($post_id, $title)
 
 
     }
-    //$content .= WP_CODEX_CONTENT_START.print_r($meta_value,true).WP_CODEX_CONTENT_END;
+    //$content .= CDXC_CONTENT_START.print_r($meta_value,true).CDXC_CONTENT_END;
 
-    return apply_filters('codex_creator_functions_content', $content, $post_id, $title);
+    return apply_filters('cdxc_functions_content', $content, $post_id, $title);
 }
 
 /**
@@ -783,19 +783,19 @@ function codex_creator_functions_content($post_id, $title)
  * @param string $title Title for the content section.
  * @return string The formatted content.
  */
-function codex_creator_location_content($post_id, $title)
+function cdxc_location_content($post_id, $title)
 {
     $content = '';
-    $meta_type = get_post_meta($post_id, 'codex_creator_meta_type', true);
+    $meta_type = get_post_meta($post_id, 'cdxc_meta_type', true);
     if ($meta_type == 'file') {
         return false;
     }
-    $meta_value = get_post_meta($post_id, 'codex_creator_meta_path', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_path', true);
     if (!$meta_value) {
         return;
     }
-    $line = get_post_meta($post_id, 'codex_creator_meta_line', true);
-    $content .= WP_CODEX_TITLE_START . $title . WP_CODEX_TITLE_END;
+    $line = get_post_meta($post_id, 'cdxc_meta_line', true);
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
 
     $file_name = basename($meta_value);
     $func_arr = get_post($post_id);
@@ -804,11 +804,11 @@ function codex_creator_location_content($post_id, $title)
     $file_arr = get_page_by_title($file_name, OBJECT, 'codex_creator');
     if (is_object($file_arr)) {
         $link = get_permalink($file_arr->ID);
-        $content .= WP_CODEX_CONTENT_START . $func_name . '() ' . __('is located in', WP_CODEX_TEXTDOMAIN) . ' <a href="' . $link . '">' . $meta_value . '</a> [' . __('Line', WP_CODEX_TEXTDOMAIN) . ': ' . $line . ']' . WP_CODEX_CONTENT_END;
+        $content .= CDXC_CONTENT_START . $func_name . '() ' . __('is located in', CDXC_TEXTDOMAIN) . ' <a href="' . $link . '">' . $meta_value . '</a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $line . ']' . CDXC_CONTENT_END;
     } else {
-        $content .= WP_CODEX_CONTENT_START . $func_name . '() ' . __('is located in', WP_CODEX_TEXTDOMAIN) . ' ' . $meta_value . ' [' . __('Line', WP_CODEX_TEXTDOMAIN) . ': ' . $line . ']' . WP_CODEX_CONTENT_END;
+        $content .= CDXC_CONTENT_START . $func_name . '() ' . __('is located in', CDXC_TEXTDOMAIN) . ' ' . $meta_value . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $line . ']' . CDXC_CONTENT_END;
     }
 
 
-    return apply_filters('codex_creator_location_content', $content, $post_id, $title);
+    return apply_filters('cdxc_location_content', $content, $post_id, $title);
 }

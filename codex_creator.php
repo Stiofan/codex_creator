@@ -7,15 +7,19 @@
  */
 
 /*
-Plugin Name: WordPress Codex Creator
+Plugin Name: Codex Creator
 Plugin URI: http://www.nomaddevs.com/
-Description: This plugin was designed to create codex documentation for WordPress plugins and themes.s
-Version: 0.0.1
+Description: This plugin was designed to create codex documentation for WordPress plugins and themes.
+Version: 1.0.0
 Author: NomadDevs
 Author URI: http://www.nomaddevs.com/
 */
 
 
+/*
+ * For testing only, should be removed for release.
+ * @todo remove this for release.
+ */
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(-1);
@@ -25,19 +29,19 @@ if (!defined('ABSPATH')) exit;
 /**
  * Define constants
  */
-define('WP_CODED_VERSION', '0.0.1');
-define('WP_CODEX_ROOT', __FILE__);
-define('WP_CODEX_ROOT_DOC', __DIR__);
-define('WP_CODEX_TEXTDOMAIN', 'codex_creator');
-define('WP_CODEX_URL', plugin_dir_url(WP_CODEX_ROOT));
+define('CDXC_VERSION', '1.0.0');
+define('CDXC_ROOT', __FILE__);
+define('CDXC_ROOT_DOC', __DIR__);
+define('CDXC_TEXTDOMAIN', 'codex_creator');
+define('CDXC_URL', plugin_dir_url(CDXC_ROOT));
 
-define('WP_CODEX_TITLE_START', "<h4>");
-define('WP_CODEX_TITLE_END', "</h4>");
-define('WP_CODEX_CONTENT_START', "<p>");
-define('WP_CODEX_CONTENT_END', "</p>");
+define('CDXC_TITLE_START', "<h4>");
+define('CDXC_TITLE_END', "</h4>");
+define('CDXC_CONTENT_START', "<p>");
+define('CDXC_CONTENT_END', "</p>");
 
-define('WP_CODEX_SAMPLE_OPEN', "<pre>");
-define('WP_CODEX_SAMPLE_CLOSE', "</pre>");
+define('CDXC_SAMPLE_OPEN', "<pre>");
+define('CDXC_SAMPLE_CLOSE', "</pre>");
 
 
 
@@ -47,7 +51,7 @@ define('WP_CODEX_SAMPLE_CLOSE', "</pre>");
 include_once('phpDocumentor/Reflection/DocBlock.php');
 
 
-$codex_creator_docblock_include_arr = array(
+$cdxc_docblock_include_arr = array(
     "/phpDocumentor/Reflection/DocBlock/Description.php",
     "/phpDocumentor/Reflection/DocBlock/Tag.php",
     "/phpDocumentor/Reflection/DocBlock/Tag/ReturnTag.php",
@@ -65,11 +69,11 @@ $codex_creator_docblock_include_arr = array(
 );
 
 
-foreach ($codex_creator_docblock_include_arr as $cdx_inc) {
-    require_once(WP_CODEX_ROOT_DOC . $cdx_inc);
+foreach ($cdxc_docblock_include_arr as $cdx_inc) {
+    require_once(CDXC_ROOT_DOC . $cdx_inc);
 }
 /*
-foreach (glob(WP_CODEX_ROOT_DOC."/phpDocumentor/Reflection/DocBlock/Tag/*.php") as $filename)
+foreach (glob(CDXC_ROOT_DOC."/phpDocumentor/Reflection/DocBlock/Tag/*.php") as $filename)
 {
 	require_once $filename;
 }

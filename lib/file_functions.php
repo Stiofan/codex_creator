@@ -12,7 +12,7 @@
  * @package Codex Creator
  * @return array An array of allowed file types.
  */
-function codex_creator_allowed_file_types()
+function cdxc_allowed_file_types()
 {
     return array('php', 'js', 'css',);
 }
@@ -25,11 +25,11 @@ function codex_creator_allowed_file_types()
  * @param string $file The absolute path of the file.
  * @return mixed The contents of the file if successful. False on failure.
  */
-function codex_creator_get_file($file)
+function cdxc_get_file($file)
 {
     global $wp_filesystem;
     if (!$wp_filesystem) {
-        $wp_filesystem = codex_creator_init_filesystem();
+        $wp_filesystem = cdxc_init_filesystem();
     }
     return $wp_filesystem->get_contents($file);
 }
@@ -42,11 +42,11 @@ function codex_creator_get_file($file)
  * @param string $file The absolute path of the file.
  * @return mixed The contents of the file as an array if successful. False on failure.
  */
-function codex_creator_get_file_array($file)
+function cdxc_get_file_array($file)
 {
     global $wp_filesystem;
     if (!$wp_filesystem) {
-        $wp_filesystem = codex_creator_init_filesystem();
+        $wp_filesystem = cdxc_init_filesystem();
     }
     return $wp_filesystem->get_contents_array($file);
 }
@@ -59,12 +59,12 @@ function codex_creator_get_file_array($file)
  * @param string $file_path The absolute path of the file.
  * @return bool|string The DocBlock if successful. False on failure.
  */
-function codex_creator_has_file_docblock($file_path)
+function cdxc_has_file_docblock($file_path)
 {
     global $wp_filesystem;
 
-    $files_output = codex_creator_get_file_array($file_path);
-    $docblock = codex_creator_get_file_docblock($files_output);
+    $files_output = cdxc_get_file_array($file_path);
+    $docblock = cdxc_get_file_docblock($files_output);
 
     if ($docblock) {
         return $docblock;
@@ -86,9 +86,9 @@ function codex_creator_has_file_docblock($file_path)
  * @param string $file_path The absolute path of the file.
  * @return array|bool The array of DocBlock info if successful. False if no functions present in file.
  */
-function codex_creator_get_file_functions_arr($file)
+function cdxc_get_file_functions_arr($file)
 {
-    $file_output = codex_creator_get_file($file);
+    $file_output = cdxc_get_file($file);
 
     $tokens = token_get_all($file_output);
     //print_r($tokens);
@@ -141,9 +141,9 @@ function codex_creator_get_file_functions_arr($file)
  * @package Codex Creator
  * @param string $file_path The absolute path of the file.
  */
-function codex_creator_get_file_functions($file)
+function cdxc_get_file_functions($file)
 {
-    $func_arr = codex_creator_get_file_functions_arr($file);
+    $func_arr = cdxc_get_file_functions_arr($file);
 
     if (!empty($func_arr)) {
         echo '<ul class="cc-function-tree">';
@@ -151,7 +151,7 @@ function codex_creator_get_file_functions($file)
             if (!empty($fnc_name[0])) {
                 $func_info = '';
             } else {
-                $func_info = '<i class="fa fa-exclamation-triangle" title="' . __('Function does not contain a DocBlock', WP_CODEX_TEXTDOMAIN) . '"></i>';
+                $func_info = '<i class="fa fa-exclamation-triangle" title="' . __('Function does not contain a DocBlock', CDXC_TEXTDOMAIN) . '"></i>';
             }
             echo '<li data-cc-scan-file="' . $file . '" data-cc-scan-function="' . $fnc_name[1] . '" class="cc-file-tree-function">' . $fnc_name[1] . ' [line: ' . $fnc_name[2] . ']';
             echo '<span class="cc-function-info-bloc">' . $func_info . '</span>';
@@ -170,7 +170,7 @@ function codex_creator_get_file_functions($file)
  * @param array $lines A array of lines from a file.
  * @return bool|string Returns a string of the DocBlock on success. False if no DocBlock.
  */
-function codex_creator_get_file_docblock($lines)
+function cdxc_get_file_docblock($lines)
 {
     if (empty($lines)) {
         return false;

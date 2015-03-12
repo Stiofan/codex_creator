@@ -50,16 +50,16 @@
  * Admin meta boxes
  */
 
-#codex_creator_meta_box textarea {
+#cdxc_meta_box textarea {
     width: 100%;
     height: 65px;
 }
 
-#codex_creator_meta_box input {
+#cdxc_meta_box input {
     width: 100%;
 }
 
-#codex_creator_meta_box label {
+#cdxc_meta_box label {
     font-weight: bold;
 }
 

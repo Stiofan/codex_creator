@@ -18,16 +18,16 @@ function cdxc_create_posttype()
 {
 
     $labels = array(
-        'name' => __('Codex', WP_CODEX_TEXTDOMAIN),
-        'singular_name' => __('Codex', WP_CODEX_TEXTDOMAIN),
-        'add_new' => __('Add New', WP_CODEX_TEXTDOMAIN),
-        'add_new_item' => __('Add New Page', WP_CODEX_TEXTDOMAIN),
-        'edit_item' => __('Edit Page', WP_CODEX_TEXTDOMAIN),
-        'new_item' => __('New Page', WP_CODEX_TEXTDOMAIN),
-        'view_item' => __('View Page', WP_CODEX_TEXTDOMAIN),
-        'search_items' => __('Search Pages', WP_CODEX_TEXTDOMAIN),
-        'not_found' => __('No Page Found', WP_CODEX_TEXTDOMAIN),
-        'not_found_in_trash' => __('No Page Found In Trash', WP_CODEX_TEXTDOMAIN));
+        'name' => __('Codex', CDXC_TEXTDOMAIN),
+        'singular_name' => __('Codex', CDXC_TEXTDOMAIN),
+        'add_new' => __('Add New', CDXC_TEXTDOMAIN),
+        'add_new_item' => __('Add New Page', CDXC_TEXTDOMAIN),
+        'edit_item' => __('Edit Page', CDXC_TEXTDOMAIN),
+        'new_item' => __('New Page', CDXC_TEXTDOMAIN),
+        'view_item' => __('View Page', CDXC_TEXTDOMAIN),
+        'search_items' => __('Search Pages', CDXC_TEXTDOMAIN),
+        'not_found' => __('No Page Found', CDXC_TEXTDOMAIN),
+        'not_found_in_trash' => __('No Page Found In Trash', CDXC_TEXTDOMAIN));
 
     $codex_defaults = array(
         'labels' => $labels,
@@ -42,6 +42,7 @@ function cdxc_create_posttype()
         'query_var' => true,
         'rewrite' => array('slug' => 'codex/%codex_project%', 'with_front' => false, 'hierarchical' => true),
         //'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'custom-fields', 'comments', 'revisions', /*'post-formats'*/ ),
+        'supports' => array( 'title', 'comments', 'revisions', /*'post-formats'*/ ),
         'taxonomies' => array('codex_category', 'codex_tags'));
 
     register_post_type('codex_creator', $codex_defaults);
@@ -110,8 +111,8 @@ add_action('init', 'cdxc_create_posttype');
 
 
 // insert the project folder in the permalink
-add_filter('post_link', 'codex_creator_permalink', 1, 3);
-add_filter('post_type_link', 'codex_creator_permalink', 1, 3);
+add_filter('post_link', 'cdxc_permalink', 1, 3);
+add_filter('post_type_link', 'cdxc_permalink', 1, 3);
 
 /**
  * Rewrite the codex permalink to include the sub category name instead of the main category name
@@ -124,7 +125,7 @@ add_filter('post_type_link', 'codex_creator_permalink', 1, 3);
  * @param $post_id
  * @return mixed
  */
-function codex_creator_permalink($permalink, $post_id)
+function cdxc_permalink($permalink, $post_id)
 {
 
     if (strpos($permalink, '%codex_project%') === FALSE) return $permalink;

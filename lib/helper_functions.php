@@ -1,13 +1,20 @@
 <?php
 /**
- * Small functions mostly used to run checks
+ * Mostly small functions mostly used to run checks
  *
  * @since 1.0.0
  * @package Codex Creator
  */
 
-
-function codex_creator_has_codex($el)
+/**
+ * Check if a project exists or not.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $el The name of the project, plugin or theme name.
+ * @return bool Return true if exists. False if not exists.
+ */
+function cdxc_has_codex($el)
 {
     $term = term_exists($el, 'codex_project');
     if ($term !== 0 && $term !== null) {
@@ -17,38 +24,55 @@ function codex_creator_has_codex($el)
     }
 }
 
-function codex_creator_status_text($type, $el)
+/**
+ * Outputs the status of a project and gives further options.
+ *
+ * Used in step 3 above the file tree, this outputs the status of the project and lets the user add the project or do further actions via ajax.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string Optional. $type Not yet implemented, will be either ('plugin','theme').
+ * @param string $el This is the name of the project, the name of the plugin or theme.
+ */
+function cdxc_status_text($type, $el)
 {
-    $term = codex_creator_has_codex($el);
+    $term = cdxc_has_codex($el);
 
     echo '<div class="cc-add-update-project-bloc">';
     if ($term) {
         ?>
 
-        <h4><?php _e('It looks like this project is already added, select an option below.', WP_CODEX_TEXTDOMAIN); ?></h4>
-        <span onclick="codex_creator_sync_project_files('<?php echo $type; ?>','<?php echo $el; ?>');"
-              class="cc-add-project-btn button button-primary"><?php _e('Sync all files', WP_CODEX_TEXTDOMAIN); ?></span>
+        <h4><?php _e('It looks like this project is already added, select an option below.', CDXC_TEXTDOMAIN); ?></h4>
+        <span onclick="cdxc_sync_project_files('<?php echo $type; ?>','<?php echo $el; ?>');"
+              class="cc-add-project-btn button button-primary"><?php _e('Sync all files', CDXC_TEXTDOMAIN); ?></span>
 
         <?php // @todo add tools such as add link to docblock to codex page, create basic docblocks for pages/functions ?>
-        <h4><?php _e('Other tools to be added soon.', WP_CODEX_TEXTDOMAIN); ?></h4>
+        <h4><?php _e('Other tools to be added soon.', CDXC_TEXTDOMAIN); ?></h4>
 
     <?php
 
     } else { ?>
 
-        <h4><?php _e('It looks like this is a new project, please click below to add it.', WP_CODEX_TEXTDOMAIN); ?></h4>
-        <span onclick="codex_creator_add_project('<?php echo $type; ?>','<?php echo $el; ?>');"
-              class="cc-add-project-btn button button-primary"><?php _e('Add new project', WP_CODEX_TEXTDOMAIN); ?></span>
+        <h4><?php _e('It looks like this is a new project, please click below to add it.', CDXC_TEXTDOMAIN); ?></h4>
+        <span onclick="cdxc_add_project('<?php echo $type; ?>','<?php echo $el; ?>');"
+              class="cc-add-project-btn button button-primary"><?php _e('Add new project', CDXC_TEXTDOMAIN); ?></span>
 
     <?php
     }
     echo '</div>';
 }
 
-
-function codex_creator_is_allowed_file($file)
+/**
+ * Checks if a file is in the allowed file types.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $file The name of the file, eg: functions.php.
+ * @return bool True if allowed. False if not allowed.
+ */
+function cdxc_is_allowed_file($file)
 {
-    $allowed = codex_creator_allowed_file_types();
+    $allowed = cdxc_allowed_file_types();
     $ext = pathinfo($file, PATHINFO_EXTENSION);
     if (in_array($ext, $allowed)) {
         return true;
@@ -56,16 +80,22 @@ function codex_creator_is_allowed_file($file)
     return false;
 }
 
-
-function codex_creator_codex_create_content($post_id)
+/**
+ * Generated the post content from the post metadata and updates the post content with it.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id The post id to run.
+ */
+function cdxc_codex_create_content($post_id)
 {
     global $wpdb;
-    $docblocks = codex_creator_suported_docblocks();
+    $docblocks = cdxc_suported_docblocks();
     $content = '';
 
     foreach ($docblocks as $key => $title) {//echo "$key \n";
 
-        $content .= call_user_func('codex_creator_' . $key . '_content', $post_id, $title);
+        $content .= call_user_func('cdxc_' . $key . '_content', $post_id, $title);
 
     }
 
@@ -83,9 +113,18 @@ function codex_creator_codex_create_content($post_id)
 
 }
 
-//codex_creator_codex_create_content(1316);
+//cdxc_codex_create_content(1316);
 
-function codex_creator_post_exits($title, $cat)
+/**
+ * Checks if a post exists for the given project.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param string $title The title of the post to check.
+ * @param string $cat The name of the project to check.
+ * @return bool|int Returns the post id if exists. False if project does not exist. False if project exists but post does not exist.
+ */
+function cdxc_post_exits($title, $cat)
 {
     global $wpdb;
 

@@ -13,19 +13,19 @@
  * @since 1.0.0
  * @package Codex Creator
  */
-function codex_creator_step_1(cType) {
+function cdxc_step_1(cType) {
 
     if (cType == 'theme') {
         alert('coming soon');
     } else if (cType == 'plugin') {
-        jQuery('#codex_creator_type_val').val(cType);
-        codex_creator_get_step_2('plugin');
-        codex_creator_set_active_step(2);
+        jQuery('#cdxc_type_val').val(cType);
+        cdxc_get_step_2('plugin');
+        cdxc_set_active_step(2);
     }
 
 }
 
-function codex_creator_set_active_step(step) {
+function cdxc_set_active_step(step) {
     // remove active class from all
     jQuery(".cc-step .codex-creator-step-content").slideUp("slow", function () {
         jQuery(".cc-step").removeClass("cc-active");
@@ -40,7 +40,7 @@ function codex_creator_set_active_step(step) {
 }
 
 
-function codex_creator_get_step_2(cType) {
+function cdxc_get_step_2(cType) {
     if (!cType) {
         return;
     }// bail if no type
@@ -49,7 +49,7 @@ function codex_creator_get_step_2(cType) {
     jQuery.ajax({
         url: ajaxurl,
         data: {
-            'action': 'codex_creator_get_type_list',
+            'action': 'cdxc_get_type_list',
             'c_type': cType
         },
         success: function (data) {
@@ -62,16 +62,16 @@ function codex_creator_get_step_2(cType) {
     });
 }
 
-function codex_creator_step_3($type, $plugin, $name) {
+function cdxc_step_3($type, $plugin, $name) {
     // alert($name);
-    jQuery('#codex_creator_project_name_val').val($name);
-    jQuery('#codex_creator_project_root_val').val($plugin);
-    codex_creator_scan_files($type, $plugin, $name)
-    codex_creator_set_active_step(3);
+    jQuery('#cdxc_project_name_val').val($name);
+    jQuery('#cdxc_project_root_val').val($plugin);
+    cdxc_scan_files($type, $plugin, $name)
+    cdxc_set_active_step(3);
 }
 
 
-function codex_creator_scan_files($type, $plugin, $name) {
+function cdxc_scan_files($type, $plugin, $name) {
     if (!$type) {
         return;
     }// bail if no type
@@ -80,7 +80,7 @@ function codex_creator_scan_files($type, $plugin, $name) {
     jQuery.ajax({
         url: ajaxurl,
         data: {
-            'action': 'codex_creator_scan',
+            'action': 'cdxc_scan',
             'c_type': $type,
             'c_path': $plugin,
             'c_name': $name
@@ -96,7 +96,7 @@ function codex_creator_scan_files($type, $plugin, $name) {
 }
 
 
-function codex_creator_add_project($type, $el) {
+function cdxc_add_project($type, $el) {
 
     if (!$type || !$el) {
         return;
@@ -106,7 +106,7 @@ function codex_creator_add_project($type, $el) {
     jQuery.ajax({
         url: ajaxurl,
         data: {
-            'action': 'codex_creator_add_project',
+            'action': 'cdxc_add_project',
             'c_type': $type,
             'c_name': $el
         },
@@ -125,7 +125,7 @@ function codex_creator_add_project($type, $el) {
 
 
 cc_curent_sync_file = '';
-function codex_creator_sync_project_files($type, $el, $last) {
+function cdxc_sync_project_files($type, $el, $last) {
     if (!$type || !$el) {
         return;
     }// bail if no type
@@ -141,7 +141,7 @@ function codex_creator_sync_project_files($type, $el, $last) {
         cc_curent_sync_file = this;
 
         //move screen to show progress
-        codex_creator_scroll_to(cc_curent_sync_file);
+        cdxc_scroll_to(cc_curent_sync_file);
 
 
         file_loc = jQuery(this).data('cc-scan-file');
@@ -150,7 +150,7 @@ function codex_creator_sync_project_files($type, $el, $last) {
         jQuery.ajax({
             url: ajaxurl,
             data: {
-                'action': 'codex_creator_sync_file',
+                'action': 'cdxc_sync_file',
                 'c_type': $type,
                 'c_name': $el,
                 'file_loc': file_loc
@@ -164,9 +164,9 @@ function codex_creator_sync_project_files($type, $el, $last) {
 
                 if (index === total_files - 1) {
                     // this is the last one
-                    codex_creator_sync_project_functions($type, $el, cc_curent_sync_file, 1);
+                    cdxc_sync_project_functions($type, $el, cc_curent_sync_file, 1);
                 } else {
-                    codex_creator_sync_project_functions($type, $el, cc_curent_sync_file, 0);
+                    cdxc_sync_project_functions($type, $el, cc_curent_sync_file, 0);
                 }
 
             },
@@ -183,7 +183,7 @@ function codex_creator_sync_project_files($type, $el, $last) {
 }
 
 cc_curent_sync_function = '';
-function codex_creator_sync_project_functions($type, $el, $file, $last) {
+function cdxc_sync_project_functions($type, $el, $file, $last) {
     if (!$type || !$el) {
         return;
     }// bail if no type
@@ -205,7 +205,7 @@ function codex_creator_sync_project_functions($type, $el, $file, $last) {
             cc_curent_sync_function = this;
 
             //move screen to show progress
-            codex_creator_scroll_to(cc_curent_sync_function);
+            cdxc_scroll_to(cc_curent_sync_function);
 
             file_loc = jQuery(this).data('cc-scan-file');
             function_name = jQuery(this).data('cc-scan-function');
@@ -214,7 +214,7 @@ function codex_creator_sync_project_functions($type, $el, $file, $last) {
             jQuery.ajax({
                 url: ajaxurl,
                 data: {
-                    'action': 'codex_creator_sync_function',
+                    'action': 'cdxc_sync_function',
                     'c_type': $type,
                     'c_name': $el,
                     'file_loc': file_loc,
@@ -231,14 +231,14 @@ function codex_creator_sync_project_functions($type, $el, $file, $last) {
 
                         if ($last) {
                             //alert('done0');
-                            codex_creator_calc_project_posts($type, $el);
+                            cdxc_calc_project_posts($type, $el);
 
                         } else {
-                            codex_creator_sync_project_files($type, $el);
+                            cdxc_sync_project_files($type, $el);
                         }
 
                     } else {
-                        codex_creator_sync_project_functions($type, $el, $file, $last);
+                        cdxc_sync_project_functions($type, $el, $file, $last);
                     }
                 },
                 error: function (errorThrown) {
@@ -255,29 +255,29 @@ function codex_creator_sync_project_functions($type, $el, $file, $last) {
 
     } else {// else continue to next file;
         if ($last) {
-            codex_creator_calc_project_posts($type, $el);
+            cdxc_calc_project_posts($type, $el);
 
         } else {
-            codex_creator_sync_project_files($type, $el);
+            cdxc_sync_project_files($type, $el);
         }
     }
 
 
 }
 
-function codex_creator_calc_project_posts($type, $el) {
+function cdxc_calc_project_posts($type, $el) {
     // This does the ajax request
     jQuery.ajax({
         url: ajaxurl,
         data: {
-            'action': 'codex_creator_calc_project_posts',
+            'action': 'cdxc_calc_project_posts',
             'c_type': $type,
             'c_name': $el
         },
         success: function (data) {
             if (data) {
-                codex_creator_create_loading_bar_content(data);
-                codex_creator_create_codex_content($type, $el, data);
+                cdxc_create_loading_bar_content(data);
+                cdxc_create_codex_content($type, $el, data);
             }
         },
         error: function (errorThrown) {
@@ -288,13 +288,19 @@ function codex_creator_calc_project_posts($type, $el) {
 }
 
 $cc_progress_count = 0;
-function codex_creator_create_codex_content($type, $el, $count, $post_id) {
+$cdxc_last_content_build = '';
+function cdxc_create_codex_content($type, $el, $count, $post_id) {
 
+    //add fail safe incase of looping.
+    if($cdxc_last_content_build && $cdxc_last_content_build==$post_id){
+        alert('Something has gone wrong while building the content for post#'+$cdxc_last_content_build);return;//@todo make the string translatable.
+    }
+    $cdxc_last_content_build = $post_id;
     // This does the ajax request
     jQuery.ajax({
         url: ajaxurl,
         data: {
-            'action': 'codex_creator_create_content_ajax',
+            'action': 'cdxc_create_content_ajax',
             'c_type': $type,
             'c_name': $el,
             'count': $count,
@@ -305,8 +311,8 @@ function codex_creator_create_codex_content($type, $el, $count, $post_id) {
             //if a post id is returned then loop
             if (data) {
                 console.log(data);
-                codex_creator_create_loading_bar_update($cc_progress_count);
-                codex_creator_create_codex_content($type, $el, $count, data);
+                cdxc_create_loading_bar_update($cc_progress_count);
+                cdxc_create_codex_content($type, $el, $count, data);
 
             } else {
                 alert('done');
@@ -321,7 +327,7 @@ function codex_creator_create_codex_content($type, $el, $count, $post_id) {
 
 }
 
-function codex_creator_create_loading_bar_content($count) {
+function cdxc_create_loading_bar_content($count) {
 
     // @todo make this string translatable
     loading_div = '<h4>Please wait while we cross reference each file/function and build the page content.</h4>' +
@@ -336,12 +342,13 @@ function codex_creator_create_loading_bar_content($count) {
 
 }
 
-function codex_creator_create_loading_bar_update($num) {
+function cdxc_create_loading_bar_update($num) {
 
     $count = jQuery('.cc-loading-div').data("count");
 
 
     $percent = $num / $count * 100;
+
 
     jQuery('.cc-loading-div .cc-loading-progress').html($percent.toFixed(2) + '%');
     jQuery('.cc-loading-div .cc-loading-progress').width($percent.toFixed(2) + '%');
@@ -354,7 +361,7 @@ function codex_creator_create_loading_bar_update($num) {
 }
 
 
-function codex_creator_scroll_to($el) {
+function cdxc_scroll_to($el) {
     jQuery('html, body').animate({
         scrollTop: jQuery($el).offset().top - 150
     }, 200);

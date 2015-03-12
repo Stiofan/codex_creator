@@ -15,7 +15,7 @@
  * @since 1.0.0
  * @package Codex Creator
  */
-function codex_creator_get_type_list()
+function cdxc_get_type_list()
 {
     if (isset($_REQUEST['c_type']) && $_REQUEST['c_type'] == 'plugin') {
         //print_r(get_plugins());
@@ -25,11 +25,11 @@ function codex_creator_get_type_list()
         foreach ($plugins as $name => $plugin) {
 
             $project = '';
-            if (codex_creator_has_codex($plugin['Name'])) {
-                $project = '<i class="fa fa-book" title="' . __('Project exists', WP_CODEX_TEXTDOMAIN) . '"></i> ';
+            if (cdxc_has_codex($plugin['Name'])) {
+                $project = '<i class="fa fa-book" title="' . __('Project exists', CDXC_TEXTDOMAIN) . '"></i> ';
             }
 
-            echo "<li data-plugin='" . $name . "' onclick=\"codex_creator_step_3('plugin','$name','" . $plugin['Name'] . "');\" class=\"cc-plugin-theme-list button button-primary\">" . $project . $plugin['Name'] . "</li>";
+            echo "<li data-plugin='" . $name . "' onclick=\"cdxc_step_3('plugin','$name','" . $plugin['Name'] . "');\" class=\"cc-plugin-theme-list button button-primary\">" . $project . $plugin['Name'] . "</li>";
         }
         echo "<ul>";
 
@@ -41,7 +41,7 @@ function codex_creator_get_type_list()
 }
 
 // add function to ajax
-add_action('wp_ajax_codex_creator_get_type_list', 'codex_creator_get_type_list');
+add_action('wp_ajax_cdxc_get_type_list', 'cdxc_get_type_list');
 
 /**
  * Outputs Step 3.
@@ -51,12 +51,12 @@ add_action('wp_ajax_codex_creator_get_type_list', 'codex_creator_get_type_list')
  * @since 1.0.0
  * @package Codex Creator
  */
-function codex_creator_scan()
+function cdxc_scan()
 {
     global $wp_filesystem;
-    $wp_filesystem = codex_creator_init_filesystem();
+    $wp_filesystem = cdxc_init_filesystem();
     if (!$wp_filesystem) {
-        _e('Codex Creator can not access the filesystem.', WP_CODEX_TEXTDOMAIN);
+        _e('Codex Creator can not access the filesystem.', CDXC_TEXTDOMAIN);
         exit;
     }
 
@@ -72,11 +72,11 @@ function codex_creator_scan()
         }
 
         // Check the status and display the apropriate actions
-        codex_creator_status_text($_REQUEST['c_type'], $_REQUEST['c_name']);
+        cdxc_status_text($_REQUEST['c_type'], $_REQUEST['c_name']);
 
         $files = $wp_filesystem->dirlist($path, true, true);
 
-        codex_creator_scan_output($files, $path);
+        cdxc_scan_output($files, $path);
 
 
     }
@@ -84,7 +84,7 @@ function codex_creator_scan()
 }
 
 // add function to ajax
-add_action('wp_ajax_codex_creator_scan', 'codex_creator_scan');
+add_action('wp_ajax_cdxc_scan', 'cdxc_scan');
 
 /**
  * Build the file/folder tree for step 3.
@@ -97,7 +97,7 @@ add_action('wp_ajax_codex_creator_scan', 'codex_creator_scan');
  * @param string $path Optional. The absolute file path to the plugin/theme being scanned.
  * @param string $folder Optional. A folder base path for files in the $files array.
  */
-function codex_creator_scan_output($files, $path, $folder = '')
+function cdxc_scan_output($files, $path, $folder = '')
 {
     echo "<ul class='cc-file-tree'>";
     foreach ($files as $file) {
@@ -114,27 +114,27 @@ function codex_creator_scan_output($files, $path, $folder = '')
             if ($file['files']) {
                 $folder_org = $folder;
                 $folder .= $file['name'] . '/';
-                codex_creator_scan_output($file['files'], $path, $folder);
+                cdxc_scan_output($file['files'], $path, $folder);
                 $folder = $folder_org;
             }
             echo "</li>";
 
 
         } elseif ($file['type'] == 'f') {// file
-            if (!codex_creator_is_allowed_file($file['name'])) {
+            if (!cdxc_is_allowed_file($file['name'])) {
                 continue;
             }// if file not an allowed file type skip it
             $file_info = '';
             $file_path = $path . "/" . $folder . $file['name'];
-            $has_docblock = codex_creator_has_file_docblock($file_path);
+            $has_docblock = cdxc_has_file_docblock($file_path);
             if ($has_docblock) {
 
                 //check if the file
-                //$file_info = '<i class="fa fa-exclamation-triangle" title="'.__( 'Save', WP_CODEX_TEXTDOMAIN ).'"></i>';
+                //$file_info = '<i class="fa fa-exclamation-triangle" title="'.__( 'Save', CDXC_TEXTDOMAIN ).'"></i>';
 
 
             } else {
-                $file_info = '<i class="fa fa-exclamation-triangle" title="' . __('File does not contain a file header DocBlock', WP_CODEX_TEXTDOMAIN) . '"></i>';
+                $file_info = '<i class="fa fa-exclamation-triangle" title="' . __('File does not contain a file header DocBlock', CDXC_TEXTDOMAIN) . '"></i>';
             }
             echo "<li data-cc-scan-file='" . $file_path . "' class='cc-file-tree-file' ><i class='fa fa-file-o'></i> $folder" . $file['name'];
             echo '<span class="cc-file-info-bloc">' . $file_info . '</span>';
@@ -144,7 +144,7 @@ function codex_creator_scan_output($files, $path, $folder = '')
             /**
              * @todo this is wrong childing, this should be inside the above <li>
              */
-            codex_creator_get_file_functions($file_path);// get all the functions in the file
+            cdxc_get_file_functions($file_path);// get all the functions in the file
 
 
         }
@@ -154,10 +154,15 @@ function codex_creator_scan_output($files, $path, $folder = '')
 
 }
 
+
 /**
- * @return bool|string
+ * Initiate the WordPress file system and provide fallback if needed.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @return bool|string Returns the file system class on success. False on failure.
  */
-function codex_creator_init_filesystem()
+function cdxc_init_filesystem()
 {
     $access_type = get_filesystem_method();
     if ($access_type === 'direct') {
@@ -191,34 +196,47 @@ function codex_creator_init_filesystem()
     } else {
         return '@@@2';
         /* don't have direct write access. Prompt user with our notice */
-        add_action('admin_notice', 'codex_creator_filesystem_notice');
+        add_action('admin_notice', 'cdxc_filesystem_notice');
         return false;
     }
 
 }
 
-add_action('admin_init', 'codex_creator_filesystem_notice');
+add_action('admin_init', 'cdxc_filesystem_notice');
 
-function codex_creator_filesystem_notice()
+/**
+ * Output error message for file system access.
+ *
+ * Displays an admin message if the WordPress file system can't be automatically accessed. Called via admin_init hook.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
+function cdxc_filesystem_notice()
 {
     $access_type = get_filesystem_method();
     if ($access_type === 'direct') {
     } elseif (!defined('FTP_USER')) {
         ?>
         <div class="error">
-            <p><?php _e('Codex Creator does not have access to your filesystem. Please define your details in wp-config.php as explained here', WP_CODEX_TEXTDOMAIN); ?>
+            <p><?php _e('Codex Creator does not have access to your filesystem. Please define your details in wp-config.php as explained here', CDXC_TEXTDOMAIN); ?>
                 <a target="_blank" href="http://codex.wordpress.org/Editing_wp-config.php#WordPress_Upgrade_Constants">http://codex.wordpress.org/Editing_wp-config.php#WordPress_Upgrade_Constants</a>
             </p>
         </div>
     <?php }
 }
 
-
-function codex_creator_add_project()
+/**
+ * Adds the project as a CTP category, called via ajax.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
+function cdxc_add_project()
 {
 
     if (!isset($_REQUEST['c_name'])) {
-        _e('There was a problem adding this project.', WP_CODEX_TEXTDOMAIN);
+        _e('There was a problem adding this project.', CDXC_TEXTDOMAIN);
         die();
     }
     $project = array('cat_name' => $_REQUEST['c_name'], 'category_description' => '', 'taxonomy' => 'codex_project');
@@ -229,35 +247,25 @@ function codex_creator_add_project()
             $error_string = $result->get_error_message();
             echo '<div id="message" class="error"><p>' . $error_string . '</p></div>';
         } else {
-            codex_creator_status_text($_REQUEST['c_type'], $_REQUEST['c_name']);
+            cdxc_status_text($_REQUEST['c_type'], $_REQUEST['c_name']);
         }
 
     } else {
-        _e('There was a problem adding this project.', WP_CODEX_TEXTDOMAIN);
+        _e('There was a problem adding this project.', CDXC_TEXTDOMAIN);
     }
     die();
 }
 
 // add function to ajax
-add_action('wp_ajax_codex_creator_add_project', 'codex_creator_add_project');
+add_action('wp_ajax_cdxc_add_project', 'cdxc_add_project');
 
 /**
- * Adds or updates file from project
+ * Scans a file and saves it's DocBlock to a post or updates if already present.
  *
- * @access public
  * @since 1.0.0
- * @since 1.0.1 added stuff
- *
- * @see Function/method/class relied on
- * @link URL
- * @global type $varname Description.
- * @global type $varname Description.
- *
- * @param type $var Description.
- * @param type $var Optional. Description.
- * @return type Description.
+ * @package Codex Creator
  */
-function codex_creator_sync_file()
+function cdxc_sync_file()
 {
 
 
@@ -277,7 +285,7 @@ function codex_creator_sync_file()
 
     $phpdoc = false;
     //get the docblock and skip file if set to ignore
-    $docblock = codex_creator_has_file_docblock($file_loc);
+    $docblock = cdxc_has_file_docblock($file_loc);
     if ($docblock) {
 
         $phpdoc = new \phpDocumentor\Reflection\DocBlock($docblock);
@@ -289,7 +297,7 @@ function codex_creator_sync_file()
     }
 
 
-    if ($post_id = codex_creator_post_exits($file, $c_name)) {// file exists so we have post_id
+    if ($post_id = cdxc_post_exits($file, $c_name)) {// file exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -338,16 +346,16 @@ function codex_creator_sync_file()
 
 
     if ($docblock) {
-        update_post_meta($post_id, 'codex_creator_meta_docblock', $docblock); // raw docblock
+        update_post_meta($post_id, 'cdxc_meta_docblock', $docblock); // raw docblock
     }
 
-    update_post_meta($post_id, 'codex_creator_meta_type', 'file'); // file || function etc
-    update_post_meta($post_id, 'codex_creator_meta_path', $file_path); // path to file
-    update_post_meta($post_id, 'codex_creator_meta_path', $file_path); // path to file
+    update_post_meta($post_id, 'cdxc_meta_type', 'file'); // file || function etc
+    update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
+    update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
 
-    $func_arr = codex_creator_get_file_functions_arr($file_loc);
+    $func_arr = cdxc_get_file_functions_arr($file_loc);
     if (!empty($func_arr)) {
-        update_post_meta($post_id, 'codex_creator_meta_functions', $func_arr); // array of functions
+        update_post_meta($post_id, 'cdxc_meta_functions', $func_arr); // array of functions
     }
 
     //read and save docblocks
@@ -357,12 +365,12 @@ function codex_creator_sync_file()
 
         //summary
         if ($phpdoc->getShortDescription()) {
-            update_post_meta($post_id, 'codex_creator_summary', $phpdoc->getShortDescription());
+            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
         }
 
         //description
         if ($phpdoc->getLongDescription()->getContents()) {
-            update_post_meta($post_id, 'codex_creator_description', $phpdoc->getLongDescription()->getContents());
+            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
         }
 
 
@@ -373,7 +381,7 @@ function codex_creator_sync_file()
         foreach ($phpdoc->getTags() as $tag) {
 
             if (isset($tags_used[$tag->getName()])) {// if there are multiple tags
-                $cur_tags = get_post_meta($post_id, 'codex_creator_' . $tag->getName(), false);
+                $cur_tags = get_post_meta($post_id, 'cdxc_' . $tag->getName(), false);
                 $cur_tags[] = $tag->getContent();
 
                 $content = $cur_tags;
@@ -387,28 +395,28 @@ function codex_creator_sync_file()
 
 
             if ($tag->getName() == 'deprecated') {
-                update_post_meta($post_id, 'codex_creator_deprecated', $content);
+                update_post_meta($post_id, 'cdxc_deprecated', $content);
             }
             if ($tag->getName() == 'internal') {
-                update_post_meta($post_id, 'codex_creator_internal', $content);
+                update_post_meta($post_id, 'cdxc_internal', $content);
             }
             if ($tag->getName() == 'link') {
-                update_post_meta($post_id, 'codex_creator_link', $content);
+                update_post_meta($post_id, 'cdxc_link', $content);
             }
             if ($tag->getName() == 'package') {
-                update_post_meta($post_id, 'codex_creator_package', $content);
+                update_post_meta($post_id, 'cdxc_package', $content);
             }
             if ($tag->getName() == 'see') {
-                update_post_meta($post_id, 'codex_creator_see', $content);
+                update_post_meta($post_id, 'cdxc_see', $content);
             }
             if ($tag->getName() == 'since') {
-                update_post_meta($post_id, 'codex_creator_since', $content);
+                update_post_meta($post_id, 'cdxc_since', $content);
             }
             if ($tag->getName() == 'subpackage') {
-                update_post_meta($post_id, 'codex_creator_subpackage', $content);
+                update_post_meta($post_id, 'cdxc_subpackage', $content);
             }
             if ($tag->getName() == 'todo') {
-                update_post_meta($post_id, 'codex_creator_todo', $content);
+                update_post_meta($post_id, 'cdxc_todo', $content);
             }
 
 
@@ -417,7 +425,7 @@ function codex_creator_sync_file()
 
 
     } else {// no docblock
-        update_post_meta($post_id, 'codex_creator_summary', __('This file has not been documented yet.', WP_CODEX_TEXTDOMAIN));
+        update_post_meta($post_id, 'cdxc_summary', __('This file has not been documented yet.', CDXC_TEXTDOMAIN));
     }
 
 
@@ -425,10 +433,15 @@ function codex_creator_sync_file()
 }
 
 // add function to ajax
-add_action('wp_ajax_codex_creator_sync_file', 'codex_creator_sync_file');
+add_action('wp_ajax_cdxc_sync_file', 'cdxc_sync_file');
 
-
-function codex_creator_sync_function()
+/**
+ * Scans a function and saves it's DocBlock to a post or updates if already present.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
+function cdxc_sync_function()
 {
 
     $c_type = $_REQUEST['c_type'];
@@ -445,7 +458,7 @@ function codex_creator_sync_function()
     $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
     $file = basename($file_loc);
 
-    $func_arr = codex_creator_get_file_functions_arr($file_loc);
+    $func_arr = cdxc_get_file_functions_arr($file_loc);
     $docblock = '';
     $found_func = false;
     $phpdoc = false;
@@ -480,7 +493,7 @@ function codex_creator_sync_function()
     }
 
 
-    if ($post_id = codex_creator_post_exits($function_name, $c_name)) {// post exists so we have post_id
+    if ($post_id = cdxc_post_exits($function_name, $c_name)) {// post exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -529,13 +542,13 @@ function codex_creator_sync_function()
 
 
     if ($docblock) {
-        update_post_meta($post_id, 'codex_creator_meta_docblock', $docblock); // raw docblock
+        update_post_meta($post_id, 'cdxc_meta_docblock', $docblock); // raw docblock
     }
 
 
-    update_post_meta($post_id, 'codex_creator_meta_type', 'function'); // file || function etc
-    update_post_meta($post_id, 'codex_creator_meta_path', $file_path); // path to file
-    update_post_meta($post_id, 'codex_creator_meta_line', $found_func[2]); // line at which function starts
+    update_post_meta($post_id, 'cdxc_meta_type', 'function'); // file || function etc
+    update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
+    update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
 
 
     //read and save docblocks
@@ -545,17 +558,17 @@ function codex_creator_sync_function()
 
         //summary
         if ($phpdoc->getShortDescription()) {
-            update_post_meta($post_id, 'codex_creator_summary', $phpdoc->getShortDescription());
+            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
         }
 
         //description
         if ($phpdoc->getLongDescription()->getContents()) {
-            update_post_meta($post_id, 'codex_creator_description', $phpdoc->getLongDescription()->getContents());
+            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
         }
 
 
         //print_r($phpdoc->getTags());
-        $dock_blocks = codex_creator_suported_docblocks();
+        $dock_blocks = cdxc_suported_docblocks();
         // save all the function tags
         $tags_used = array();
         foreach ($phpdoc->getTags() as $tag) {
@@ -565,7 +578,7 @@ function codex_creator_sync_function()
 
                     if (isset($tags_used[$key])) {// if there are multiple tags
                         $cur_tags = '';
-                        $temp_tags = get_post_meta($post_id, 'codex_creator_' . $key, true);
+                        $temp_tags = get_post_meta($post_id, 'cdxc_' . $key, true);
                         if (is_array($temp_tags)) {
                             $cur_tags = $temp_tags;
                         } else {
@@ -575,10 +588,10 @@ function codex_creator_sync_function()
                         $cur_tags[] = $tag->getContent();
 
 
-                        update_post_meta($post_id, 'codex_creator_' . $key, $cur_tags);
+                        update_post_meta($post_id, 'cdxc_' . $key, $cur_tags);
 
                     } else {
-                        update_post_meta($post_id, 'codex_creator_' . $key, $tag->getContent());
+                        update_post_meta($post_id, 'cdxc_' . $key, $tag->getContent());
                     }
 
 
@@ -591,7 +604,7 @@ function codex_creator_sync_function()
 
 
     } else {// no docblock
-        update_post_meta($post_id, 'codex_creator_summary', __('This function has not been documented yet.', WP_CODEX_TEXTDOMAIN));
+        update_post_meta($post_id, 'cdxc_summary', __('This function has not been documented yet.', CDXC_TEXTDOMAIN));
     }
 
 
@@ -599,10 +612,15 @@ function codex_creator_sync_function()
 }
 
 // add function to ajax
-add_action('wp_ajax_codex_creator_sync_function', 'codex_creator_sync_function');
+add_action('wp_ajax_cdxc_sync_function', 'cdxc_sync_function');
 
-
-function codex_creator_calc_project_posts()
+/**
+ * Ajax function to calculate the total posts for a project.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
+function cdxc_calc_project_posts()
 {
     global $wpdb;
     $project = $_REQUEST['c_name'];
@@ -627,10 +645,15 @@ function codex_creator_calc_project_posts()
     die();
 }
 
-add_action('wp_ajax_codex_creator_calc_project_posts', 'codex_creator_calc_project_posts');
+add_action('wp_ajax_cdxc_calc_project_posts', 'cdxc_calc_project_posts');
 
-
-function codex_creator_create_content_ajax()
+/**
+ * Ajax function to build the page content from saved metadata.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ */
+function cdxc_create_content_ajax()
 {
     global $wpdb;
     $project = $_REQUEST['c_name'];
@@ -644,49 +667,53 @@ function codex_creator_create_content_ajax()
         echo '0';
         exit;
     }
-    //if( $post_id==2628){echo '###1';}
-    //$posts = $wpdb->get_results($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d",$term_id));
-    codex_creator_codex_create_content($post_id);
-    //if( $post_id==2628){echo '###2';}
+
+
+    cdxc_codex_create_content($post_id);
+
     $post_next = $wpdb->get_var($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d AND p.ID>%d ORDER BY p.ID ASC", $term_id, $post_id));
 
-    /*foreach ($posts as $p) {
-        codex_creator_codex_create_content($p->ID);
-    }*/
 
     echo $post_next;
 
     die();
 }
 
-add_action('wp_ajax_codex_creator_create_content_ajax', 'codex_creator_create_content_ajax');
+add_action('wp_ajax_cdxc_create_content_ajax', 'cdxc_create_content_ajax');
 
-function codex_creator_suported_docblocks()
+/**
+ * Returns an array of supported DocBlocks.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @return array The DocBlocks supported by Codex Creator as an array (SLUG => NAME).
+ */
+function cdxc_suported_docblocks()
 {
     $dock_blocks = array(
-        'summary' => __('Summary', WP_CODEX_TEXTDOMAIN),
-        'description' => __('Description', WP_CODEX_TEXTDOMAIN),
-        'usage' => __('Usage', WP_CODEX_TEXTDOMAIN),//non standard
-        'access' => __('Access', WP_CODEX_TEXTDOMAIN),
-        'deprecated' => __('Deprecated', WP_CODEX_TEXTDOMAIN),
-        'global' => __('Global Values', WP_CODEX_TEXTDOMAIN),
-        'internal' => __('Internal', WP_CODEX_TEXTDOMAIN),
-        'ignore' => __('Ignore', WP_CODEX_TEXTDOMAIN),
-        'link' => __('Link', WP_CODEX_TEXTDOMAIN),
-        'method' => __('Method', WP_CODEX_TEXTDOMAIN),
-        'package' => __('Package', WP_CODEX_TEXTDOMAIN),
-        'param' => __('Parameters', WP_CODEX_TEXTDOMAIN),
-        'example' => __('Example', WP_CODEX_TEXTDOMAIN),//non standard
-        'return' => __('Return Values', WP_CODEX_TEXTDOMAIN),
-        'see' => __('See', WP_CODEX_TEXTDOMAIN),
-        'since' => __('Change Log', WP_CODEX_TEXTDOMAIN),
-        'subpackage' => __('Subpackage', WP_CODEX_TEXTDOMAIN),
-        'todo' => __('Todo', WP_CODEX_TEXTDOMAIN),
-        'type' => __('Type', WP_CODEX_TEXTDOMAIN),
-        'uses' => __('Uses', WP_CODEX_TEXTDOMAIN),
-        'var' => __('Var', WP_CODEX_TEXTDOMAIN),
-        'functions' => __('Functions', WP_CODEX_TEXTDOMAIN),//non standard
-        'location' => __('Source File', WP_CODEX_TEXTDOMAIN),//non standard
+        'summary' => __('Summary', CDXC_TEXTDOMAIN),
+        'description' => __('Description', CDXC_TEXTDOMAIN),
+        'usage' => __('Usage', CDXC_TEXTDOMAIN),//non standard
+        'access' => __('Access', CDXC_TEXTDOMAIN),
+        'deprecated' => __('Deprecated', CDXC_TEXTDOMAIN),
+        'global' => __('Global Values', CDXC_TEXTDOMAIN),
+        'internal' => __('Internal', CDXC_TEXTDOMAIN),
+        'ignore' => __('Ignore', CDXC_TEXTDOMAIN),
+        'link' => __('Link', CDXC_TEXTDOMAIN),
+        'method' => __('Method', CDXC_TEXTDOMAIN),
+        'package' => __('Package', CDXC_TEXTDOMAIN),
+        'param' => __('Parameters', CDXC_TEXTDOMAIN),
+        'example' => __('Example', CDXC_TEXTDOMAIN),//non standard
+        'return' => __('Return Values', CDXC_TEXTDOMAIN),
+        'see' => __('See', CDXC_TEXTDOMAIN),
+        'since' => __('Change Log', CDXC_TEXTDOMAIN),
+        'subpackage' => __('Subpackage', CDXC_TEXTDOMAIN),
+        'todo' => __('Todo', CDXC_TEXTDOMAIN),
+        'type' => __('Type', CDXC_TEXTDOMAIN),
+        'uses' => __('Uses', CDXC_TEXTDOMAIN),
+        'var' => __('Var', CDXC_TEXTDOMAIN),
+        'functions' => __('Functions', CDXC_TEXTDOMAIN),//non standard
+        'location' => __('Source File', CDXC_TEXTDOMAIN),//non standard
 
 
     );
