@@ -50,7 +50,9 @@ define('CDXC_SAMPLE_CLOSE', "</pre>");
  */
 include_once('phpDocumentor/Reflection/DocBlock.php');
 
-
+/*
+ * include only what we need from phpdocumentor.
+ */
 $cdxc_docblock_include_arr = array(
     "/phpDocumentor/Reflection/DocBlock/Description.php",
     "/phpDocumentor/Reflection/DocBlock/Tag.php",
@@ -72,12 +74,7 @@ $cdxc_docblock_include_arr = array(
 foreach ($cdxc_docblock_include_arr as $cdx_inc) {
     require_once(CDXC_ROOT_DOC . $cdx_inc);
 }
-/*
-foreach (glob(CDXC_ROOT_DOC."/phpDocumentor/Reflection/DocBlock/Tag/*.php") as $filename)
-{
-	require_once $filename;
-}
-*/
+
 
 
 /**
