@@ -721,3 +721,20 @@ function cdxc_suported_docblocks()
 
     return $dock_blocks;
 }
+
+
+function cdxc_add_title_ref( $title, $id = null ) {
+
+    $post_obj = get_queried_object();
+
+    if ( is_single() && $post_obj->post_type=='codex_creator') {
+        if (get_post_meta($id,'cdxc_meta_type', true) == 'file') {
+            $title= __('File Reference', CDXC_TEXTDOMAIN).': '.$title;
+        } elseif (get_post_meta($id,'cdxc_meta_type', true) == 'function') {
+            $title= __('Function Reference', CDXC_TEXTDOMAIN).': '.$title;
+        }
+    }
+
+    return $title;
+}
+add_filter( 'the_title', 'cdxc_add_title_ref', 10, 2 );

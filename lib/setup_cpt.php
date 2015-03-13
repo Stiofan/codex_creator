@@ -41,6 +41,7 @@ function cdxc_create_posttype()
         'public' => true,
         'query_var' => true,
         'rewrite' => array('slug' => 'codex/%codex_project%', 'with_front' => false, 'hierarchical' => true),
+       // 'rewrite' => array('slug' => 'codex/%codex_project%', 'with_front' => false, 'hierarchical' => true),
         //'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'custom-fields', 'comments', 'revisions', /*'post-formats'*/ ),
         'supports' => array( 'title', 'comments', 'revisions', /*'post-formats'*/ ),
         'taxonomies' => array('codex_project', 'codex_tags'));
@@ -68,7 +69,7 @@ function cdxc_create_posttype()
         'show_ui' => true,
         'show_admin_column' => true,
         'query_var' => true,
-        'rewrite' => array('slug' => 'project'),
+        'rewrite' => array('slug' => 'codex_project'),
     );
 
     register_taxonomy('codex_project', 'codex_creator', $args);
@@ -125,8 +126,10 @@ add_filter('post_type_link', 'cdxc_permalink', 1, 3);
  * @param $post_id
  * @return mixed
  */
+
 function cdxc_permalink($permalink, $post_id)
 {
+
 
     if (strpos($permalink, '%codex_project%') === FALSE) return $permalink;
     // Get post
@@ -160,3 +163,26 @@ function cdxc_permalink($permalink, $post_id)
 
     return $permalink;
 }
+
+
+add_filter( 'post_type_archive_link', 'cdxc_permalink_post_type',2,2 );
+
+function cdxc_permalink_post_type($link, $post_type){
+
+    if($post_type=='codex_creator'){
+        $link = str_replace('%codex_project%/', '', $link);
+        $link = str_replace('%codex_project%', '', $link);
+    }
+
+    return $link;
+}
+
+add_filter('generate_rewrite_rules', 'cdxc_rewrite_post_type_base');
+function cdxc_rewrite_post_type_base($wp_rewrite) {
+    $newrules = array();
+    $newrules['codex/?$'] = 'index.php?post_type=codex_creator';
+    $wp_rewrite->rules = $newrules + $wp_rewrite->rules;
+    return $wp_rewrite;
+}
+
+

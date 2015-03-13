@@ -152,7 +152,8 @@ function cdxc_save_meta_box_data($post_id)
 
     foreach ($dock_blocks as $key => $title) {
         if (isset($_POST['cdxc_' . $key])) {
-            $my_data = sanitize_text_field($_POST['cdxc_' . $key]);
+            //$my_data = sanitize_text_field($_POST['cdxc_' . $key]);
+            $my_data = $_POST['cdxc_' . $key];
             update_post_meta($post_id, 'cdxc_' . $key, $my_data);
         }
     }
