@@ -26,7 +26,7 @@
     display: block;
 }
 
-.cc-function-tree,
+.cc-code-bits-tree,
 .cc-file-tree .cc-file-tree {
     padding-left: 15px;
 }
@@ -35,6 +35,8 @@
 
 }
 
+.cc-file-tree-action,
+.cc-file-tree-filter,
 .cc-file-tree-function,
 .cc-file-tree-file {
     border: 1px solid #ccc;

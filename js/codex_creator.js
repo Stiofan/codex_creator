@@ -164,9 +164,9 @@ function cdxc_sync_project_files($type, $el, $last) {
 
                 if (index === total_files - 1) {
                     // this is the last one
-                    cdxc_sync_project_functions($type, $el, cc_curent_sync_file, 1);
+                    cdxc_sync_project_file_code_bits($type, $el, cc_curent_sync_file, 1);
                 } else {
-                    cdxc_sync_project_functions($type, $el, cc_curent_sync_file, 0);
+                    cdxc_sync_project_file_code_bits($type, $el, cc_curent_sync_file, 0);
                 }
 
             },
@@ -183,17 +183,16 @@ function cdxc_sync_project_files($type, $el, $last) {
 }
 
 cc_curent_sync_function = '';
-function cdxc_sync_project_functions($type, $el, $file, $last) {
+function cdxc_sync_project_file_code_bits($type, $el, $file, $last) {
     if (!$type || !$el) {
         return;
     }// bail if no type
 
     funcsP = jQuery($file).next();
 
-
-    if (funcsP.attr("class") == 'cc-function-tree') {// if the file has functions
-        var total_func = jQuery(funcsP).children(".cc-file-tree-function").length;
-        jQuery(funcsP).children(".cc-file-tree-function").each(function (index) {
+    if (funcsP.attr("class") == 'cc-code-bits-tree') {// if the file has code bits
+        var total_func = jQuery(funcsP).children(".cc-file-tree-code-bit").length;
+        jQuery(funcsP).children(".cc-file-tree-code-bit").each(function (index) {
 
             //jQuery( this ).css('background-color', 'lightblue');
 
@@ -208,17 +207,19 @@ function cdxc_sync_project_functions($type, $el, $file, $last) {
             cdxc_scroll_to(cc_curent_sync_function);
 
             file_loc = jQuery(this).data('cc-scan-file');
-            function_name = jQuery(this).data('cc-scan-function');
+            bit_name = jQuery(this).data('cc-scan-bit');
+            bit_type = jQuery(this).data('cc-bit-type');
 
             // This does the ajax request
             jQuery.ajax({
                 url: ajaxurl,
                 data: {
-                    'action': 'cdxc_sync_function',
+                    'action': 'cdxc_sync_bits',
                     'c_type': $type,
                     'c_name': $el,
                     'file_loc': file_loc,
-                    'function_name': function_name
+                    'bit_name': bit_name,
+                    'bit_type': bit_type
                 },
                 success: function (data) {
                     jQuery(this).data('sync', 1);
@@ -238,7 +239,7 @@ function cdxc_sync_project_functions($type, $el, $file, $last) {
                         }
 
                     } else {
-                        cdxc_sync_project_functions($type, $el, $file, $last);
+                        cdxc_sync_project_file_code_bits($type, $el, $file, $last);
                     }
                 },
                 error: function (errorThrown) {
@@ -264,6 +265,7 @@ function cdxc_sync_project_functions($type, $el, $file, $last) {
 
 
 }
+
 
 function cdxc_calc_project_posts($type, $el) {
     // This does the ajax request

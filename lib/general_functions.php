@@ -7,6 +7,18 @@
  */
 
 
+        /**
+         * this is a dummy filter
+         * @todo remove this for production.
+         */
+         apply_filters( 'my_filter_tag', $value ='123');
+
+        /**
+         * a dummy tag for testing, should be removed.
+         * @todo remove this for production.
+         */
+        do_action('my_tag', $my_arg = false);
+
 /**
  * Outputs a list of installed plugins.
  *
@@ -136,7 +148,7 @@ function cdxc_scan_output($files, $path, $folder = '')
             } else {
                 $file_info = '<i class="fa fa-exclamation-triangle" title="' . __('File does not contain a file header DocBlock', CDXC_TEXTDOMAIN) . '"></i>';
             }
-            echo "<li data-cc-scan-file='" . $file_path . "' class='cc-file-tree-file' ><i class='fa fa-file-o'></i> $folder" . $file['name'];
+            echo "<li data-cc-scan-file='" . $file_path . "' class='cc-file-tree-file' ><i class='fa fa-file-code-o'></i> $folder" . $file['name'];
             echo '<span class="cc-file-info-bloc">' . $file_info . '</span>';
 
             echo "</li>";
@@ -144,7 +156,16 @@ function cdxc_scan_output($files, $path, $folder = '')
             /**
              * @todo this is wrong childing, this should be inside the above <li>
              */
-            cdxc_get_file_functions($file_path);// get all the functions in the file
+            $code_content = '';
+            $code_content .= cdxc_get_file_functions($file_path);// get all the functions in the file.
+            $code_content .= cdxc_get_file_actions($file_path); //get all the actions in a file.
+            $code_content .= cdxc_get_file_filters($file_path); //get all the actions in a file.
+
+            if($code_content){
+                echo '<ul class="cc-code-bits-tree">';
+                echo $code_content;
+                echo '</ul>';
+            }
 
 
         }
@@ -164,6 +185,10 @@ function cdxc_scan_output($files, $path, $folder = '')
  */
 function cdxc_init_filesystem()
 {
+
+    if(!function_exists('get_filesystem_method')){
+        require_once(ABSPATH."/wp-admin/includes/file.php");
+    }
     $access_type = get_filesystem_method();
     if ($access_type === 'direct') {
         /* you can safely run request_filesystem_credentials() without any issues and don't need to worry about passing in a URL */
@@ -314,13 +339,16 @@ function cdxc_sync_file()
             exit;
         }
 
-        $file_cat_arr = term_exists('file', 'codex_project', $parent_id);
+        $file_cat_arr = term_exists('files', 'codex_project', $parent_id);
 
         if (isset($file_cat_arr['term_id'])) {
             $file_cat_id = $file_cat_arr['term_id'];
 
         } else {
-            $file_cat = array('cat_name' => 'file', 'category_parent' => $parent_id, 'taxonomy' => 'codex_project', 'category_nicename' => $parent_slug . '_FILE');
+            $file_cat = array('cat_name' => 'files',
+                'category_parent' => $parent_id,
+                'taxonomy' => 'codex_project',
+                'category_nicename' => $parent_slug . '_files');
             $file_cat_id = wp_insert_category($file_cat);
 
             if (!$file_cat_id) {
@@ -442,14 +470,34 @@ add_action('wp_ajax_cdxc_sync_file', 'cdxc_sync_file');
  * @since 1.0.0
  * @package Codex Creator
  */
-function cdxc_sync_function()
+function cdxc_sync_bits()
 {
 
     $c_type = $_REQUEST['c_type'];
+    $bit_type = $_REQUEST['bit_type'];
     $c_name = $_REQUEST['c_name'];
     $file_loc = $_REQUEST['file_loc'];
-    $function_name = $_REQUEST['function_name'];
+    $bit_name = $_REQUEST['bit_name'];
 
+    if($bit_type=='function'){
+        cdxc_sync_function($file_loc,$bit_name,$c_name,$c_type);
+    }elseif($bit_type=='action'){
+        cdxc_sync_action($file_loc,$bit_name,$c_name,$c_type);
+    }
+    elseif($bit_type=='filter'){
+        cdxc_sync_filter($file_loc,$bit_name,$c_name,$c_type);
+    }
+
+    die();
+}
+
+// add function to ajax
+add_action('wp_ajax_cdxc_sync_bits', 'cdxc_sync_bits');
+
+
+
+function cdxc_sync_function($file_loc,$function_name,$c_name,$c_type)
+{
     // check file is in plugin dir
     if (strpos($file_loc, WP_PLUGIN_DIR) === false) {
         echo '0';
@@ -510,13 +558,17 @@ function cdxc_sync_function()
             exit;
         }
 
-        $file_cat_arr = term_exists('function', 'codex_project', $parent_id);
+        $file_cat_arr = term_exists('functions', 'codex_project', $parent_id);
 
         if (isset($file_cat_arr['term_id'])) {
             $file_cat_id = $file_cat_arr['term_id'];
 
         } else {
-            $file_cat = array('cat_name' => 'function', 'category_parent' => $parent_id, 'taxonomy' => 'codex_project', 'category_nicename' => $parent_slug . '_FUNCTION');
+            $file_cat = array(
+                'cat_name' => 'functions',
+                'category_parent' => $parent_id,
+                'taxonomy' => 'codex_project',
+                'category_nicename' => $parent_slug . '_functions');
             $file_cat_id = wp_insert_category($file_cat);
 
             if (!$file_cat_id) {
@@ -609,11 +661,341 @@ function cdxc_sync_function()
     }
 
 
-    die();
+
 }
 
-// add function to ajax
-add_action('wp_ajax_cdxc_sync_function', 'cdxc_sync_function');
+function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
+{
+    // check file is in plugin dir
+    if (strpos($file_loc, WP_PLUGIN_DIR) === false) {
+        echo '0';
+        exit;
+    }
+
+    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    $file = basename($file_loc);
+
+    $func_arr = cdxc_get_file_actions_arr($file_loc);
+    $docblock = '';
+    $found_func = false;
+    $phpdoc = false;
+    if (empty($func_arr)) {
+        echo '0';
+        exit;
+    }
+
+    foreach ($func_arr as $func) {
+
+        if ($func[1] == $function_name) {
+            $found_func = $func;
+            $docblock = $func[0];
+        }
+
+
+    }
+
+    if (!$found_func) {
+        echo '0';
+        exit;
+    }
+
+    if ($docblock) {
+
+        $phpdoc = new \phpDocumentor\Reflection\DocBlock($docblock);
+        //if @ignore tag present then bail
+        if ($phpdoc->hasTag('ignore')) {
+            return;
+        }
+
+    }
+
+
+    if ($post_id = cdxc_post_exits($function_name, $c_name)) {// post exists so we have post_id
+
+    } else {// file does not exist so create
+
+        //check the right categories exist or create them
+        $parent_id_arr = term_exists($c_name, 'codex_project');
+        if (isset($parent_id_arr['term_id'])) {
+            $parent_id = $parent_id_arr['term_id'];
+
+            $term = get_term($parent_id, 'codex_project');
+            $parent_slug = $term->slug;
+        } else {
+            echo 'parent cat not exist';
+            exit;
+        }
+
+        $file_cat_arr = term_exists('actions', 'codex_project', $parent_id);
+
+        if (isset($file_cat_arr['term_id'])) {
+            $file_cat_id = $file_cat_arr['term_id'];
+
+        } else {
+            $file_cat = array(
+                'cat_name' => 'actions',
+                'category_parent' => $parent_id,
+                'taxonomy' => 'codex_project',
+                'category_nicename' => $parent_slug . '_actions');
+            $file_cat_id = wp_insert_category($file_cat);
+
+            if (!$file_cat_id) {
+                echo 'error creating file cat';
+                exit;
+            }
+
+        }
+
+        // Create post object
+        $my_post = array(
+            'post_title' => $function_name,//$file_path ,
+            'post_name' => $function_name,//str_replace('/', "--", $file_path ),
+            'post_type' => 'codex_creator',
+            'post_content' => '',
+            'post_status' => 'publish',
+            'tax_input' => array('codex_project' => array($parent_id, $file_cat_id))
+        );
+        // print_r($my_post);//exit;
+        // Insert the post into the database
+        $post_id = wp_insert_post($my_post);
+
+    }
+
+
+    if ($docblock) {
+        update_post_meta($post_id, 'cdxc_meta_docblock', $docblock); // raw docblock
+    }
+
+
+    update_post_meta($post_id, 'cdxc_meta_type', 'action'); // file || function etc
+    update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
+    update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
+
+
+    //read and save docblocks
+
+    if ($phpdoc) {
+
+
+        //summary
+        if ($phpdoc->getShortDescription()) {
+            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
+        }
+
+        //description
+        if ($phpdoc->getLongDescription()->getContents()) {
+            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
+        }
+
+
+        //print_r($phpdoc->getTags());
+        $dock_blocks = cdxc_suported_docblocks();
+        // save all the function tags
+        $tags_used = array();
+        foreach ($phpdoc->getTags() as $tag) {
+
+            foreach ($dock_blocks as $key => $title) {
+                if ($tag->getName() == $key) {
+
+                    if (isset($tags_used[$key])) {// if there are multiple tags
+                        $cur_tags = '';
+                        $temp_tags = get_post_meta($post_id, 'cdxc_' . $key, true);
+                        if (is_array($temp_tags)) {
+                            $cur_tags = $temp_tags;
+                        } else {
+                            $cur_tags[] = $temp_tags;
+                        }
+
+                        $cur_tags[] = $tag->getContent();
+
+
+                        update_post_meta($post_id, 'cdxc_' . $key, $cur_tags);
+
+                    } else {
+                        update_post_meta($post_id, 'cdxc_' . $key, $tag->getContent());
+                    }
+
+
+                    $tags_used[$key] = true;
+                }
+            }
+
+            //echo '###'.$tag->getName().'::'.$tag->getContent();
+        }
+
+
+    } else {// no docblock
+        update_post_meta($post_id, 'cdxc_summary', __('This action has not been documented yet.', CDXC_TEXTDOMAIN));
+    }
+
+}
+
+function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
+{
+    // check file is in plugin dir
+    if (strpos($file_loc, WP_PLUGIN_DIR) === false) {
+        echo '0';
+        exit;
+    }
+
+    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    $file = basename($file_loc);
+
+    $func_arr = cdxc_get_file_filters_arr($file_loc);
+    $docblock = '';
+    $found_func = false;
+    $phpdoc = false;
+    if (empty($func_arr)) {
+        echo '0';
+        exit;
+    }
+
+    foreach ($func_arr as $func) {
+
+        if ($func[1] == $function_name) {
+            $found_func = $func;
+            $docblock = $func[0];
+        }
+
+
+    }
+
+    if (!$found_func) {
+        echo '0';
+        exit;
+    }
+
+    if ($docblock) {
+
+        $phpdoc = new \phpDocumentor\Reflection\DocBlock($docblock);
+        //if @ignore tag present then bail
+        if ($phpdoc->hasTag('ignore')) {
+            return;
+        }
+
+    }
+
+
+    if ($post_id = cdxc_post_exits($function_name, $c_name)) {// post exists so we have post_id
+
+    } else {// file does not exist so create
+
+        //check the right categories exist or create them
+        $parent_id_arr = term_exists($c_name, 'codex_project');
+        if (isset($parent_id_arr['term_id'])) {
+            $parent_id = $parent_id_arr['term_id'];
+
+            $term = get_term($parent_id, 'codex_project');
+            $parent_slug = $term->slug;
+        } else {
+            echo 'parent cat not exist';
+            exit;
+        }
+
+        $file_cat_arr = term_exists('actions', 'codex_project', $parent_id);
+
+        if (isset($file_cat_arr['term_id'])) {
+            $file_cat_id = $file_cat_arr['term_id'];
+
+        } else {
+            $file_cat = array(
+                'cat_name' => 'actions',
+                'category_parent' => $parent_id,
+                'taxonomy' => 'codex_project',
+                'category_nicename' => $parent_slug . '_actions');
+            $file_cat_id = wp_insert_category($file_cat);
+
+            if (!$file_cat_id) {
+                echo 'error creating file cat';
+                exit;
+            }
+
+        }
+
+        // Create post object
+        $my_post = array(
+            'post_title' => $function_name,//$file_path ,
+            'post_name' => $function_name,//str_replace('/', "--", $file_path ),
+            'post_type' => 'codex_creator',
+            'post_content' => '',
+            'post_status' => 'publish',
+            'tax_input' => array('codex_project' => array($parent_id, $file_cat_id))
+        );
+        // print_r($my_post);//exit;
+        // Insert the post into the database
+        $post_id = wp_insert_post($my_post);
+
+    }
+
+
+    if ($docblock) {
+        update_post_meta($post_id, 'cdxc_meta_docblock', $docblock); // raw docblock
+    }
+
+
+    update_post_meta($post_id, 'cdxc_meta_type', 'action'); // file || function etc
+    update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
+    update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
+
+
+    //read and save docblocks
+
+    if ($phpdoc) {
+
+
+        //summary
+        if ($phpdoc->getShortDescription()) {
+            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
+        }
+
+        //description
+        if ($phpdoc->getLongDescription()->getContents()) {
+            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
+        }
+
+
+        //print_r($phpdoc->getTags());
+        $dock_blocks = cdxc_suported_docblocks();
+        // save all the function tags
+        $tags_used = array();
+        foreach ($phpdoc->getTags() as $tag) {
+
+            foreach ($dock_blocks as $key => $title) {
+                if ($tag->getName() == $key) {
+
+                    if (isset($tags_used[$key])) {// if there are multiple tags
+                        $cur_tags = '';
+                        $temp_tags = get_post_meta($post_id, 'cdxc_' . $key, true);
+                        if (is_array($temp_tags)) {
+                            $cur_tags = $temp_tags;
+                        } else {
+                            $cur_tags[] = $temp_tags;
+                        }
+
+                        $cur_tags[] = $tag->getContent();
+
+
+                        update_post_meta($post_id, 'cdxc_' . $key, $cur_tags);
+
+                    } else {
+                        update_post_meta($post_id, 'cdxc_' . $key, $tag->getContent());
+                    }
+
+
+                    $tags_used[$key] = true;
+                }
+            }
+
+            //echo '###'.$tag->getName().'::'.$tag->getContent();
+        }
+
+
+    } else {// no docblock
+        update_post_meta($post_id, 'cdxc_summary', __('This action has not been documented yet.', CDXC_TEXTDOMAIN));
+    }
+
+}
+
 
 /**
  * Ajax function to calculate the total posts for a project.
