@@ -43,6 +43,8 @@
     padding: 0px 5px;
 }
 
+.cc-action-info-bloc,
+.cc-filter-info-bloc,
 .cc-file-info-bloc,
 .cc-function-info-bloc {
     float: right;

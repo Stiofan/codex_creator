@@ -19,10 +19,11 @@ Author URI: http://www.nomaddevs.com/
 /*
  * For testing only, should be removed for release.
  * @todo remove this for release.
- */
+ *
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(-1);
+*/
 
 
 

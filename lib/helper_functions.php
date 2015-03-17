@@ -122,19 +122,26 @@ function cdxc_codex_create_content($post_id)
  * @package Codex Creator
  * @param string $title The title of the post to check.
  * @param string $cat The name of the project to check.
+ * @param string $type The type of item to check.
  * @return bool|int Returns the post id if exists. False if project does not exist. False if project exists but post does not exist.
  */
-function cdxc_post_exits($title, $cat)
+function cdxc_post_exits($title, $cat,$type)
 {
     global $wpdb;
 
-    $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $cat));
-
-    if (!$term_id) {
+    $project_slug = $wpdb->get_var($wpdb->prepare("SELECT slug FROM $wpdb->terms WHERE name=%s", $cat));
+    if (!$project_slug) {
         return false;
     }
 
-    $post_id = $wpdb->get_var($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d AND p.post_title=%s", $term_id, $title));
+    $type_term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $project_slug.'_'.$type));
+    if (!$type_term_id) {
+        return false;
+    }
+
+
+
+    $post_id = $wpdb->get_var($wpdb->prepare("SELECT p.ID FROM $wpdb->posts p JOIN $wpdb->term_relationships tr on p.ID=tr.object_id Join $wpdb->term_taxonomy tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE p.post_type='codex_creator' AND tt.term_id=%d AND p.post_title=%s", $type_term_id, $title));
 
     if ($post_id) {
         return $post_id;

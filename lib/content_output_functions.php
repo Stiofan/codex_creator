@@ -776,6 +776,93 @@ function cdxc_functions_content($post_id, $title)
     return apply_filters('cdxc_functions_content', $content, $post_id, $title);
 }
 
+
+/**
+ * Get and format content output for actions section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
+function cdxc_actions_content($post_id, $title)
+{
+    $content = '';
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_actions', true);
+    if (!$meta_value) {
+        return;
+    }
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+
+    if (is_array($meta_value)) {
+        foreach ($meta_value as $func) {
+
+            $func_arr = get_page_by_title($func[1], OBJECT, 'codex_creator');
+
+            // print_r($func_arr);exit;
+
+            if (is_object($func_arr)) {
+                $link = get_permalink($func_arr->ID);
+                $name = "'".$func[1]."'";
+                $content .= CDXC_CONTENT_START . '<a href="' . $link . '">' .  $name . ' </a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
+            } else {
+                $content .= CDXC_CONTENT_START . $name . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
+
+            }
+
+        }
+
+
+    }
+    //$content .= CDXC_CONTENT_START.print_r($meta_value,true).CDXC_CONTENT_END;
+
+    return apply_filters('cdxc_actions_content', $content, $post_id, $title);
+}
+
+/**
+ * Get and format content output for filters section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
+function cdxc_filters_content($post_id, $title)
+{
+    $content = '';
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_actions', true);
+    if (!$meta_value) {
+        return;
+    }
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+
+    if (is_array($meta_value)) {
+        foreach ($meta_value as $func) {
+
+            $func_arr = get_page_by_title($func[1], OBJECT, 'codex_creator');
+
+            // print_r($func_arr);exit;
+
+            if (is_object($func_arr)) {
+                $link = get_permalink($func_arr->ID);
+                $name = "'".$func[1]."'";
+                $content .= CDXC_CONTENT_START . '<a href="' . $link . '">' .  $name . ' </a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
+            } else {
+                $content .= CDXC_CONTENT_START . $name . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
+
+            }
+
+        }
+
+
+    }
+    //$content .= CDXC_CONTENT_START.print_r($meta_value,true).CDXC_CONTENT_END;
+
+    return apply_filters('cdxc_filters_content', $content, $post_id, $title);
+}
+
 /**
  * Get and format content output for location section of the codex page.
  *
@@ -803,12 +890,18 @@ function cdxc_location_content($post_id, $title)
     $func_arr = get_post($post_id);
     $func_name = $func_arr->post_title;
 
+    if($meta_type=='function'){
+        $func_name_n = $func_name. '() ';
+    }else{
+        $func_name_n = "'".$func_name. "' ";
+    }
+
     $file_arr = get_page_by_title($file_name, OBJECT, 'codex_creator');
     if (is_object($file_arr)) {
         $link = get_permalink($file_arr->ID);
-        $content .= CDXC_CONTENT_START . $func_name . '() ' . __('is located in', CDXC_TEXTDOMAIN) . ' <a href="' . $link . '">' . $meta_value . '</a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $line . ']' . CDXC_CONTENT_END;
+        $content .= CDXC_CONTENT_START .$func_name_n . __('is located in', CDXC_TEXTDOMAIN) . ' <a href="' . $link . '">' . $meta_value . '</a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $line . ']' . CDXC_CONTENT_END;
     } else {
-        $content .= CDXC_CONTENT_START . $func_name . '() ' . __('is located in', CDXC_TEXTDOMAIN) . ' ' . $meta_value . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $line . ']' . CDXC_CONTENT_END;
+        $content .= CDXC_CONTENT_START . $func_name_n . __('is located in', CDXC_TEXTDOMAIN) . ' ' . $meta_value . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $line . ']' . CDXC_CONTENT_END;
     }
 
 

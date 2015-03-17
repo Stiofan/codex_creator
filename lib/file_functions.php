@@ -275,7 +275,7 @@ function cdxc_get_file_actions_arr($file)
 
 
 
-                if ($doc_block && $action_tag) {
+                if ($action_tag) {
                     $action_tag = str_replace(array("'",'"'),array('',''),$action_tag);
                     $action_arr[] = array($doc_block, $action_tag, $token[2]);
                 }
@@ -310,7 +310,7 @@ function cdxc_get_file_actions($file)
     if (!empty($action_arr)) {
 
         foreach ($action_arr as $act_name) {
-            if (!empty($action_arr[0])) {
+            if (!empty($act_name[0])) {
                 $act_info = '';
             } else {
                 $act_info = '<i class="fa fa-exclamation-triangle" title="' . __('Action does not contain a DocBlock', CDXC_TEXTDOMAIN) . '"></i>';
@@ -396,8 +396,7 @@ function cdxc_get_file_filters_arr($file)
                 else{continue;}
 
 
-
-                if ($doc_block && $action_tag) {
+                if ($action_tag) {
                     $action_tag = str_replace(array("'",'"'),array('',''),$action_tag);
                     $action_arr[] = array($doc_block, $action_tag, $token[2]);
                 }
@@ -432,7 +431,7 @@ function cdxc_get_file_filters($file)
     if (!empty($action_arr)) {
 
         foreach ($action_arr as $act_name) {
-            if (!empty($action_arr[0])) {
+            if (!empty($act_name[0])) {
                 $act_info = '';
             } else {
                 $act_info = '<i class="fa fa-exclamation-triangle" title="' . __('Filter does not contain a DocBlock', CDXC_TEXTDOMAIN) . '"></i>';

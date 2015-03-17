@@ -323,7 +323,7 @@ function cdxc_sync_file()
     }
 
 
-    if ($post_id = cdxc_post_exits($file, $c_name)) {// file exists so we have post_id
+    if ($post_id = cdxc_post_exits($file, $c_name,'files')) {// file exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -385,6 +385,16 @@ function cdxc_sync_file()
     $func_arr = cdxc_get_file_functions_arr($file_loc);
     if (!empty($func_arr)) {
         update_post_meta($post_id, 'cdxc_meta_functions', $func_arr); // array of functions
+    }
+
+    $action_arr = cdxc_get_file_actions_arr($file_loc);
+    if (!empty($action_arr)) {
+        update_post_meta($post_id, 'cdxc_meta_actions', $action_arr); // array of functions
+    }
+
+    $filter_arr = cdxc_get_file_filters_arr($file_loc);
+    if (!empty( $filter_arr)) {
+        update_post_meta($post_id, 'cdxc_meta_filters',  $filter_arr); // array of functions
     }
 
     //read and save docblocks
@@ -542,7 +552,7 @@ function cdxc_sync_function($file_loc,$function_name,$c_name,$c_type)
     }
 
 
-    if ($post_id = cdxc_post_exits($function_name, $c_name)) {// post exists so we have post_id
+    if ($post_id = cdxc_post_exits($function_name, $c_name,'functions')) {// post exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -710,7 +720,7 @@ function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
     }
 
 
-    if ($post_id = cdxc_post_exits($function_name, $c_name)) {// post exists so we have post_id
+    if ($post_id = cdxc_post_exits($function_name, $c_name,'actions')) {// post exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -876,7 +886,7 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
     }
 
 
-    if ($post_id = cdxc_post_exits($function_name, $c_name)) {// post exists so we have post_id
+    if ($post_id = cdxc_post_exits($function_name, $c_name,'filters')) {// post exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -892,17 +902,17 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
             exit;
         }
 
-        $file_cat_arr = term_exists('actions', 'codex_project', $parent_id);
+        $file_cat_arr = term_exists('filters', 'codex_project', $parent_id);
 
         if (isset($file_cat_arr['term_id'])) {
             $file_cat_id = $file_cat_arr['term_id'];
 
         } else {
             $file_cat = array(
-                'cat_name' => 'actions',
+                'cat_name' => 'filters',
                 'category_parent' => $parent_id,
                 'taxonomy' => 'codex_project',
-                'category_nicename' => $parent_slug . '_actions');
+                'category_nicename' => $parent_slug . '_filters');
             $file_cat_id = wp_insert_category($file_cat);
 
             if (!$file_cat_id) {
@@ -933,7 +943,7 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
     }
 
 
-    update_post_meta($post_id, 'cdxc_meta_type', 'action'); // file || function etc
+    update_post_meta($post_id, 'cdxc_meta_type', 'filter'); // file || function etc
     update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
     update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
 
@@ -991,7 +1001,7 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
 
 
     } else {// no docblock
-        update_post_meta($post_id, 'cdxc_summary', __('This action has not been documented yet.', CDXC_TEXTDOMAIN));
+        update_post_meta($post_id, 'cdxc_summary', __('This filter has not been documented yet.', CDXC_TEXTDOMAIN));
     }
 
 }
@@ -1096,6 +1106,8 @@ function cdxc_suported_docblocks()
         'uses' => __('Uses', CDXC_TEXTDOMAIN),
         'var' => __('Var', CDXC_TEXTDOMAIN),
         'functions' => __('Functions', CDXC_TEXTDOMAIN),//non standard
+        'actions' => __('Actions', CDXC_TEXTDOMAIN),//non standard
+        'filters' => __('Filters', CDXC_TEXTDOMAIN),//non standard
         'location' => __('Source File', CDXC_TEXTDOMAIN),//non standard
 
 
