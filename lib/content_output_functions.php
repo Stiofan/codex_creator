@@ -699,7 +699,7 @@ function cdxc_type_content($post_id, $title)
  * @return string The formatted content.
  */
 function cdxc_uses_content($post_id, $title)
-{
+{   return;// @todo make this work with arrays.
     $content = '';
     $meta_value = get_post_meta($post_id, 'cdxc_uses', true);
     if (!$meta_value) {

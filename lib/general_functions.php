@@ -6,6 +6,30 @@
  * @package Codex Creator
  */
 
+/**
+ * zzzzxxx change Stores the GeoDirectory widget locations in the theme widget areas.
+ *
+ * zzzzxxx change This function loops through the GeoDirectory widgets and saves their locations in the widget areas to an option
+ * so they can be restored later. This is called via hook.
+ *
+ *    add_action('switch_theme', 'geodir_store_sidebars');
+ *
+ * @since 1.0.0
+ * @package GeoDirectory
+ */
+function testing_yo2()
+{
+    $nothing = '';
+    /**
+     * Nothing filter.
+     *
+     * @since 1.0.0
+     * @param string $nothing Nothing.
+     */
+    $nothing = apply_filters('nothing_filter',$nothing);
+    return $nothing;
+
+}
 
         /**
          * this is a dummy filter

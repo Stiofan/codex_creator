@@ -134,7 +134,7 @@ function cdxc_post_exits($title, $cat,$type)
         return false;
     }
 
-    $type_term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $project_slug.'_'.$type));
+    $type_term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE slug=%s", $project_slug.'_'.$type));
     if (!$type_term_id) {
         return false;
     }
