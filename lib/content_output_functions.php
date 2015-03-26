@@ -800,11 +800,11 @@ function cdxc_actions_content($post_id, $title)
 
             $func_arr = get_page_by_title($func[1], OBJECT, 'codex_creator');
 
-            // print_r($func_arr);exit;
-
+            //print_r($func_arr);exit;
+            $name = "'".$func[1]."'";
             if (is_object($func_arr)) {
                 $link = get_permalink($func_arr->ID);
-                $name = "'".$func[1]."'";
+
                 $content .= CDXC_CONTENT_START . '<a href="' . $link . '">' .  $name . ' </a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
             } else {
                 $content .= CDXC_CONTENT_START . $name . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
@@ -832,7 +832,7 @@ function cdxc_actions_content($post_id, $title)
 function cdxc_filters_content($post_id, $title)
 {
     $content = '';
-    $meta_value = get_post_meta($post_id, 'cdxc_meta_actions', true);
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_filters', true);
     if (!$meta_value) {
         return;
     }
@@ -844,10 +844,10 @@ function cdxc_filters_content($post_id, $title)
             $func_arr = get_page_by_title($func[1], OBJECT, 'codex_creator');
 
             // print_r($func_arr);exit;
-
+            $name = "'".$func[1]."'";
             if (is_object($func_arr)) {
                 $link = get_permalink($func_arr->ID);
-                $name = "'".$func[1]."'";
+
                 $content .= CDXC_CONTENT_START . '<a href="' . $link . '">' .  $name . ' </a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
             } else {
                 $content .= CDXC_CONTENT_START . $name . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func[2] . ']' . CDXC_CONTENT_END;
@@ -906,4 +906,21 @@ function cdxc_location_content($post_id, $title)
 
 
     return apply_filters('cdxc_location_content', $content, $post_id, $title);
+}
+
+function cdxc_code_content($post_id, $title)
+{
+    $content = '';
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_code', true);
+
+
+    if (!$meta_value) {
+        return;
+    }
+    $meta_value = "%%CDXC_SRC_CODE%%";
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+    //$content .= CDXC_PHP_CODE_START . $meta_value . CDXC_PHP_CODE_END;
+    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
+
+    return apply_filters('cdxc_code_content', $content, $post_id, $title);
 }

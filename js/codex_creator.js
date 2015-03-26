@@ -190,7 +190,7 @@ function cdxc_sync_project_file_code_bits($type, $el, $file, $last) {
 
     funcsP = jQuery($file).next();
 
-    if (funcsP.attr("class") == 'cc-code-bits-tree') {// if the file has code bits
+    if (1==2 && funcsP.attr("class") == 'cc-code-bits-tree') {// if the file has code bits
         var total_func = jQuery(funcsP).children(".cc-file-tree-code-bit").length;
         jQuery(funcsP).children(".cc-file-tree-code-bit").each(function (index) {
 

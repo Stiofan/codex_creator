@@ -98,8 +98,13 @@ define('CDXC_TITLE_END', "</h4>");
 define('CDXC_CONTENT_START', "<p>");
 define('CDXC_CONTENT_END', "</p>");
 
+define('CDXC_PHP_CODE_START', "<pre>");
+define('CDXC_PHP_CODE_END', "</pre>");
+
 define('CDXC_SAMPLE_OPEN', "<pre>");
 define('CDXC_SAMPLE_CLOSE', "</pre>");
+
+
 
 
 
@@ -218,19 +223,26 @@ include_once('lib/file_functions.php');
  */
 include_once('lib/add_meta_boxes.php');
 
-
-
+/*
+echo '###';
+$code_src = cdxc_get_file('/home/stiofan/public_html/wp-content/plugins/test_pluing/test_pluing.php');
+echo $code_src ;
+cdxc_get_parse_file($code_src);
+*/
 
 
 /*
 //$code = '<?php echo "hi"; // some code';
-$code =  cdxc_get_file('/home/stiofan/public_html/wp-content/plugins/codex_creator/codex_creator.php');
+//$code =  cdxc_get_file('/home/stiofan/public_html/wp-content/plugins/codex_creator/codex_creator.php');
+$code =  cdxc_get_file('/home/stiofan/public_html/wp-content/plugins/hello.php');
 
 $parser = new PhpParser\Parser(new PhpParser\Lexer\Emulative);
+$nodeDumper = new PhpParser\NodeDumper;
 
 try {
     $stmts = $parser->parse($code);
     // $stmts is an array of statement nodes
+    //echo $nodeDumper->dump($stmts), "\n";
 } catch (PhpParser\Error $e) {
     echo 'Parse Error: ', $e->getMessage();
 }

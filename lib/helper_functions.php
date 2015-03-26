@@ -150,3 +150,35 @@ function cdxc_post_exits($title, $cat,$type)
     }
 
 }
+
+
+
+add_filter( 'the_content', 'cdxc_add_code_src',5 );
+/**
+ * Add a icon to the beginning of every post page.
+ *
+ * @uses is_single()
+ */
+function cdxc_add_code_src( $content ) {
+
+    if ( is_single() ) {
+        global $post;
+        if($post->post_type=='codex_creator'){
+            $src_code = get_post_meta($post->ID, 'cdxc_meta_code', true);
+
+            $before_code = CDXC_PHP_CODE_START;
+            $after_code = CDXC_PHP_CODE_END;
+            if(class_exists('SyntaxHighlighter')){
+                $start_line = get_post_meta($post->ID, 'cdxc_meta_line', true);
+                $before_code = "[php firstline=$start_line]";
+                $after_code = "[/php]";
+            }
+            $src_code = $before_code.$src_code.$after_code;
+            $content = str_replace("%%CDXC_SRC_CODE%%",$src_code,$content);
+        }
+
+    }
+
+    // Returns the content.
+    return $content;
+}

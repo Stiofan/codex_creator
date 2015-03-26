@@ -404,22 +404,26 @@ function cdxc_sync_file()
 
     update_post_meta($post_id, 'cdxc_meta_type', 'file'); // file || function etc
     update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
-    update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
 
-    $func_arr = cdxc_get_file_functions_arr($file_loc);
+
+    $els = cdxc_parse_file_for_file($file_loc,$c_name,$c_type);
+
+    $func_arr = $els[0];
     if (!empty($func_arr)) {
         update_post_meta($post_id, 'cdxc_meta_functions', $func_arr); // array of functions
     }
 
-    $action_arr = cdxc_get_file_actions_arr($file_loc);
+    $action_arr = $els[1];
     if (!empty($action_arr)) {
         update_post_meta($post_id, 'cdxc_meta_actions', $action_arr); // array of functions
     }
 
-    $filter_arr = cdxc_get_file_filters_arr($file_loc);
+    $filter_arr = $els[2];
     if (!empty( $filter_arr)) {
         update_post_meta($post_id, 'cdxc_meta_filters',  $filter_arr); // array of functions
     }
+
+
 
     //read and save docblocks
 
@@ -530,10 +534,10 @@ add_action('wp_ajax_cdxc_sync_bits', 'cdxc_sync_bits');
 
 
 
-function cdxc_sync_function($file_loc,$function_name,$c_name,$c_type)
+function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
 {
     // check file is in plugin dir
-    if (strpos($file_loc, WP_PLUGIN_DIR) === false) {
+    if (strpos($file_loc, WP_PLUGIN_DIR) === false || !is_array($func)) {
         echo '0';
         exit;
     }
@@ -541,29 +545,13 @@ function cdxc_sync_function($file_loc,$function_name,$c_name,$c_type)
     $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
     $file = basename($file_loc);
 
-    $func_arr = cdxc_get_file_functions_arr($file_loc);
-    $docblock = '';
-    $found_func = false;
+    $docblock = $func[0];
+    $function_name = $func[1];
+    $found_func = $func;
     $phpdoc = false;
-    if (empty($func_arr)) {
-        echo '0';
-        exit;
-    }
-
-    foreach ($func_arr as $func) {
-
-        if ($func[1] == $function_name) {
-            $found_func = $func;
-            $docblock = $func[0];
-        }
 
 
-    }
 
-    if (!$found_func) {
-        echo '0';
-        exit;
-    }
 
     if ($docblock) {
 
@@ -636,6 +624,29 @@ function cdxc_sync_function($file_loc,$function_name,$c_name,$c_type)
     update_post_meta($post_id, 'cdxc_meta_type', 'function'); // file || function etc
     update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
     update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
+    update_post_meta($post_id, 'cdxc_meta_code', $code); // the sorce code of the function
+
+
+    if(!empty($hooks_arr)){
+        $actions = array();
+        $filters = array();
+        foreach($hooks_arr as $hook){
+            if($hook[3]=='action'){
+                $actions[] = $hook;
+            }elseif($hook[3]=='filter'){
+                $filters[] = $hook;
+            }
+        }
+
+        if(!empty($actions)){
+            update_post_meta($post_id, 'cdxc_meta_actions', $actions); // the list of action hooks
+        }
+
+        if(!empty($filters)){
+            update_post_meta($post_id, 'cdxc_meta_filters', $filters); // the list of action hooks
+        }
+    }
+
 
 
     //read and save docblocks
@@ -698,10 +709,10 @@ function cdxc_sync_function($file_loc,$function_name,$c_name,$c_type)
 
 }
 
-function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
+function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
 {
     // check file is in plugin dir
-    if (strpos($file_loc, WP_PLUGIN_DIR) === false) {
+    if (strpos($file_loc, WP_PLUGIN_DIR) === false || !is_array($hooks) || !is_array($func)) {
         echo '0';
         exit;
     }
@@ -709,29 +720,12 @@ function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
     $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
     $file = basename($file_loc);
 
-    $func_arr = cdxc_get_file_actions_arr($file_loc);
-    $docblock = '';
-    $found_func = false;
+    $docblock = $hooks[0];
+    $hook_name = $hooks[1];
+    $hook_line = $hooks[2];
+
     $phpdoc = false;
-    if (empty($func_arr)) {
-        echo '0';
-        exit;
-    }
 
-    foreach ($func_arr as $func) {
-
-        if ($func[1] == $function_name) {
-            $found_func = $func;
-            $docblock = $func[0];
-        }
-
-
-    }
-
-    if (!$found_func) {
-        echo '0';
-        exit;
-    }
 
     if ($docblock) {
 
@@ -744,7 +738,7 @@ function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
     }
 
 
-    if ($post_id = cdxc_post_exits($function_name, $c_name,'actions')) {// post exists so we have post_id
+    if ($post_id = cdxc_post_exits( $hook_name, $c_name,'actions')) {// post exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -782,8 +776,8 @@ function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
 
         // Create post object
         $my_post = array(
-            'post_title' => $function_name,//$file_path ,
-            'post_name' => $function_name,//str_replace('/', "--", $file_path ),
+            'post_title' =>  $hook_name,//$file_path ,
+            'post_name' =>  $hook_name,//str_replace('/', "--", $file_path ),
             'post_type' => 'codex_creator',
             'post_content' => '',
             'post_status' => 'publish',
@@ -800,10 +794,19 @@ function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
         update_post_meta($post_id, 'cdxc_meta_docblock', $docblock); // raw docblock
     }
 
+    if(!empty($func)){
+        $temp_func = $func;
+        $func = array();
+        $func[0] = $temp_func;
+        update_post_meta($post_id, 'cdxc_meta_functions', $func); // raw docblock
+
+    }
+
 
     update_post_meta($post_id, 'cdxc_meta_type', 'action'); // file || function etc
     update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
-    update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
+    update_post_meta($post_id, 'cdxc_meta_line', $hook_line); // line at which function starts
+    update_post_meta($post_id, 'cdxc_meta_code', $code); // the sorce code of the function
 
 
     //read and save docblocks
@@ -864,10 +867,10 @@ function cdxc_sync_action($file_loc,$function_name,$c_name,$c_type)
 
 }
 
-function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
+function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
 {
     // check file is in plugin dir
-    if (strpos($file_loc, WP_PLUGIN_DIR) === false) {
+    if (strpos($file_loc, WP_PLUGIN_DIR) === false || !is_array($hooks) || !is_array($func)) {
         echo '0';
         exit;
     }
@@ -875,29 +878,12 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
     $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
     $file = basename($file_loc);
 
-    $func_arr = cdxc_get_file_filters_arr($file_loc);
-    $docblock = '';
-    $found_func = false;
+    $docblock = $hooks[0];
+    $hook_name = $hooks[1];
+    $hook_line = $hooks[2];
+
     $phpdoc = false;
-    if (empty($func_arr)) {
-        echo '0';
-        exit;
-    }
 
-    foreach ($func_arr as $func) {
-
-        if ($func[1] == $function_name) {
-            $found_func = $func;
-            $docblock = $func[0];
-        }
-
-
-    }
-
-    if (!$found_func) {
-        echo '0';
-        exit;
-    }
 
     if ($docblock) {
 
@@ -910,7 +896,7 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
     }
 
 
-    if ($post_id = cdxc_post_exits($function_name, $c_name,'filters')) {// post exists so we have post_id
+    if ($post_id = cdxc_post_exits( $hook_name, $c_name,'filters')) {// post exists so we have post_id
 
     } else {// file does not exist so create
 
@@ -948,8 +934,8 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
 
         // Create post object
         $my_post = array(
-            'post_title' => $function_name,//$file_path ,
-            'post_name' => $function_name,//str_replace('/', "--", $file_path ),
+            'post_title' =>  $hook_name,//$file_path ,
+            'post_name' =>  $hook_name,//str_replace('/', "--", $file_path ),
             'post_type' => 'codex_creator',
             'post_content' => '',
             'post_status' => 'publish',
@@ -966,10 +952,19 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
         update_post_meta($post_id, 'cdxc_meta_docblock', $docblock); // raw docblock
     }
 
+    if(!empty($func)){
+        $temp_func = $func;
+        $func = array();
+        $func[0] = $temp_func;
+        update_post_meta($post_id, 'cdxc_meta_functions', $func); // raw docblock
+
+    }
+
 
     update_post_meta($post_id, 'cdxc_meta_type', 'filter'); // file || function etc
     update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
-    update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
+    update_post_meta($post_id, 'cdxc_meta_line', $hook_line); // line at which function starts
+    update_post_meta($post_id, 'cdxc_meta_code', $code); // the sorce code of the function
 
 
     //read and save docblocks
@@ -1029,6 +1024,7 @@ function cdxc_sync_filter($file_loc,$function_name,$c_name,$c_type)
     }
 
 }
+
 
 
 /**
@@ -1133,6 +1129,7 @@ function cdxc_suported_docblocks()
         'actions' => __('Actions', CDXC_TEXTDOMAIN),//non standard
         'filters' => __('Filters', CDXC_TEXTDOMAIN),//non standard
         'location' => __('Source File', CDXC_TEXTDOMAIN),//non standard
+        'code' => __('Source Code', CDXC_TEXTDOMAIN),//non standard
 
 
     );
