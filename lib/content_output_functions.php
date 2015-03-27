@@ -532,12 +532,30 @@ function cdxc_see_content($post_id, $title)
     if (!$meta_value) {
         return;
     }
+
+
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
-    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
+    if (is_array($meta_value)) {
+        foreach ($meta_value as $value) {
+            $value = cdxc_see_content_helper($value);
+            $content .= CDXC_CONTENT_START . $value . CDXC_CONTENT_END;
+        }
+    } else {
+        $meta_value = cdxc_see_content_helper($meta_value);
+        $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
+    }
 
     return apply_filters('cdxc_see_content', $content, $post_id, $title);
 }
 
+
+function cdxc_see_content_helper($text)
+{
+    if ($text == '') {
+        return '';
+    }
+    return $text;
+}
 /**
  * Get and format content output for since section of the codex page.
  *

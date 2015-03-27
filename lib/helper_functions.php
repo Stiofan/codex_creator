@@ -182,3 +182,69 @@ function cdxc_add_code_src( $content ) {
     // Returns the content.
     return $content;
 }
+
+
+function cdxc_get_hook_name($hook){
+    $name = '';
+
+
+
+    if(isset($hook->args[0]->value)){
+        $root = $hook->args[0]->value;
+    }elseif(isset($hook->exprs[0]->args[0]->value)){
+        $root = $hook->exprs[0]->args[0]->value;
+    }elseif(isset($hook->expr->args[0]->value)){
+        $root = $hook->expr->args[0]->value;
+    }
+
+   // echo '>>>'.$root->getType().'<<<';
+
+
+
+
+
+    if($root->getType()=='Scalar_String' && isset($root->value)){
+        $name = $root->value;
+    }else{
+
+        $prettyPrinter = new PhpParser\PrettyPrinter\Standard;
+
+        try {
+
+            $tmp_code = array();
+            $tmp_code[0]= $root;
+            // pretty print
+            $code = $prettyPrinter->prettyPrint($tmp_code);
+
+            //echo '>>>#'.$code.'#<<<';
+        } catch (PhpParser\Error $e) {
+            echo 'Parse Error: ', $e->getMessage();
+        }
+
+        $name = str_replace(array(';',' ',' ',"'",'"'),'',$code);
+       // $name = str_replace(array('"',"'"),"'",$name);
+
+
+    }
+
+
+
+    /*elseif($root->getType()=='Scalar_Encapsed'){
+        foreach($root->parts as $part){
+            if(is_string($part)){
+                $name .= $part;
+            }elseif($part->getType()=='Expr_Variable'){
+                $name .= "{".'$'.$part->name."}";
+            }
+        }
+
+    }elseif($root->getType()=='Expr_BinaryOp_Concat'){
+
+    }*/
+
+
+    //echo '<<<'.$name.'>>>'." \r\n";
+
+    return $name;
+
+}

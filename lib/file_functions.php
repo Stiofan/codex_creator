@@ -522,7 +522,7 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
                         $hook_start = $func_part->getLine();
                         $hook_end = $func_part->getAttribute('endLine');
                         $code = '';
-                        $line = $hook_start-1;
+                        if($hook_start){$line = $hook_start-1;$hook_end=$hook_end-1;}else{$line = $hook_start;}
                         if ($line && $hook_end) {
                             if ($hook_start == $hook_end) {
                                 $code = $file_arr[$line];
@@ -536,9 +536,14 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
                         }
                         $code = addslashes_gpc($code);
 
+
+
+
+                        $actn_name = cdxc_get_hook_name($func_part);
+
                         $hooks = array();
                         $hooks[0] = $hook_doc_com;
-                        $hooks[1] = $func_part->expr->args[0]->value->value;
+                        $hooks[1] = $actn_name;//$func_part->expr->args[0]->value->value;
                         $hooks[2] = $func_part->getLine();
                         $hooks[3] = 'filter';
                         $hooks_arr[]=$hooks;
@@ -560,7 +565,7 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
                         $hook_start = $func_part->getLine();
                         $hook_end = $func_part->getAttribute('endLine');
                         $code = '';
-                        $line = $hook_start-1;
+                        if($hook_start){$line = $hook_start-1;$hook_end=$hook_end-1;}else{$line = $hook_start;}
                         if ($line && $hook_end) {
                             if ($hook_start == $hook_end) {
                                 $code = $file_arr[$line];
@@ -574,9 +579,13 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
 
                         $code = addslashes_gpc($code);
 
+
+
+                        $actn_name = cdxc_get_hook_name($func_part);
+
                         $hooks = array();
                         $hooks[0] = $hook_doc_com;
-                        $hooks[1] = $func_part->exprs[0]->args[0]->value->value;
+                        $hooks[1] = $actn_name ;//$func_part->exprs[0]->args[0]->value->value;
                         $hooks[2] = $func_part->getLine();
                         $hooks[3] = 'filter';
                         $hooks_arr[]=$hooks;
@@ -597,7 +606,7 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
                         $hook_start = $func_part->getLine();
                         $hook_end = $func_part->getAttribute('endLine');
                         $code = '';
-                        $line = $hook_start-1;
+                        if($hook_start){$line = $hook_start-1; $hook_end=$hook_end-1;}else{$line = $hook_start;}
                         if ($line && $hook_end) {
                             if ($hook_start == $hook_end) {
                                 $code = $file_arr[$line];
@@ -610,9 +619,13 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
                         }
                         $code = addslashes_gpc($code);
 
+
+
+                        $actn_name = cdxc_get_hook_name($func_part);
+
                         $hooks = array();
                         $hooks[0] = $hook_doc_com;
-                        $hooks[1] = $func_part->args[0]->value->value;
+                        $hooks[1] = $actn_name;
                         $hooks[2] = $func_part->getLine();
                         $hooks[3] = 'action';
                         $hooks_arr[]=$hooks;
@@ -628,7 +641,8 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
                 $func_start = $part->getLine();
                 $func_end = $part->getAttribute('endLine');
                 $code = '';
-                $line = $func_start-1;
+
+                if($func_start){$line = $func_start-1; $func_end = $func_end-1;}else{$line = $func_start;}
                 if ($line && $func_end) {
                     if ($func_start == $func_end) {
                         $code = $file_arr[$line];
@@ -640,6 +654,8 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
                     }
                 }
                 $code = addslashes_gpc($code);
+
+
 
 
                 /*
