@@ -3,14 +3,14 @@
  * Functions for building the page content for each codex page
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /**
  * Get and format content output for summary section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -32,7 +32,7 @@ function cdxc_summary_content($post_id, $title)
  * Get and format content output for description section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -87,7 +87,7 @@ function cdxc_description_content($post_id, $title)
  * Get and format content output for usage section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -109,7 +109,7 @@ function cdxc_usage_content($post_id, $title)
  * Get and format content output for access section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -131,7 +131,7 @@ function cdxc_access_content($post_id, $title)
  * Get and format content output for deprecated section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -153,7 +153,7 @@ function cdxc_deprecated_content($post_id, $title)
  * Get and format content output for global section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -182,7 +182,7 @@ function cdxc_global_content($post_id, $title)
  * Get and format content output for internal section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -204,7 +204,7 @@ function cdxc_internal_content($post_id, $title)
  * Get and format content output for ignore section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -226,7 +226,7 @@ function cdxc_ignore_content($post_id, $title)
  * Get and format content output for link section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -248,7 +248,7 @@ function cdxc_link_content($post_id, $title)
  * Get and format content output for method section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -270,7 +270,7 @@ function cdxc_method_content($post_id, $title)
  * Get and format content output for package section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -292,7 +292,7 @@ function cdxc_package_content($post_id, $title)
  * Get and format content output for param section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -322,7 +322,7 @@ function cdxc_param_content($post_id, $title)
  * Arrange a param value into a usable HTML output.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $param The param value to be used.
  * @return string Formatted HTML on success.
  */
@@ -409,7 +409,7 @@ function cdxc_param_content_helper($param)
  * Get and format content output for example section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -431,7 +431,7 @@ function cdxc_example_content($post_id, $title)
  * Get and format content output for return section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -454,7 +454,7 @@ function cdxc_return_content($post_id, $title)
  * Arrange a return value into a usable HTML output.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $value The string value to be used.
  * @return string Formatted HTML on success.
  */
@@ -520,7 +520,7 @@ function cdxc_return_content_helper($value)
  * Get and format content output for see section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -560,7 +560,7 @@ function cdxc_see_content_helper($text)
  * Get and format content output for since section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -645,7 +645,7 @@ function cdxc_since_content($post_id, $title)
  * Get and format content output for subpackage section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -667,7 +667,7 @@ function cdxc_subpackage_content($post_id, $title)
  * Get and format content output for todo section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -689,7 +689,7 @@ function cdxc_todo_content($post_id, $title)
  * Get and format content output for type section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -711,7 +711,7 @@ function cdxc_type_content($post_id, $title)
  * Get and format content output for uses section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -733,7 +733,7 @@ function cdxc_uses_content($post_id, $title)
  * Get and format content output for var section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -755,7 +755,7 @@ function cdxc_var_content($post_id, $title)
  * Get and format content output for functions section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -799,7 +799,7 @@ function cdxc_functions_content($post_id, $title)
  * Get and format content output for actions section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -842,7 +842,7 @@ function cdxc_actions_content($post_id, $title)
  * Get and format content output for filters section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.
@@ -885,7 +885,7 @@ function cdxc_filters_content($post_id, $title)
  * Get and format content output for location section of the codex page.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id Post ID of the post content required.
  * @param string $title Title for the content section.
  * @return string The formatted content.

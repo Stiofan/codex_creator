@@ -3,7 +3,7 @@
  * General functions for Codex Creator
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /**
@@ -49,7 +49,7 @@ function testing_yo2()
  * Builds a unordered list of installed plugins for further use with ajax functions.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_get_type_list()
 {
@@ -85,7 +85,7 @@ add_action('wp_ajax_cdxc_get_type_list', 'cdxc_get_type_list');
  * Scans the selected plugin/theme, shows the document tree and further option buttons to be called via ajax.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_scan()
 {
@@ -128,7 +128,7 @@ add_action('wp_ajax_cdxc_scan', 'cdxc_scan');
  * Scans through the selected plugin/theme and builds the actual folder/file tree for use in step 3 by further ajax functions.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param array $files An array of file and folders.
  * @param string $path Optional. The absolute file path to the plugin/theme being scanned.
  * @param string $folder Optional. A folder base path for files in the $files array.
@@ -204,7 +204,7 @@ function cdxc_scan_output($files, $path, $folder = '')
  * Initiate the WordPress file system and provide fallback if needed.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @return bool|string Returns the file system class on success. False on failure.
  */
 function cdxc_init_filesystem()
@@ -259,7 +259,7 @@ add_action('admin_init', 'cdxc_filesystem_notice');
  * Displays an admin message if the WordPress file system can't be automatically accessed. Called via admin_init hook.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_filesystem_notice()
 {
@@ -279,7 +279,7 @@ function cdxc_filesystem_notice()
  * Adds the project as a CTP category, called via ajax.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_add_project()
 {
@@ -312,7 +312,7 @@ add_action('wp_ajax_cdxc_add_project', 'cdxc_add_project');
  * Scans a file and saves it's DocBlock to a post or updates if already present.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_sync_file()
 {
@@ -501,37 +501,6 @@ function cdxc_sync_file()
 
 // add function to ajax
 add_action('wp_ajax_cdxc_sync_file', 'cdxc_sync_file');
-
-/**
- * Scans a function and saves it's DocBlock to a post or updates if already present.
- *
- * @since 1.0.0
- * @package Codex Creator
- */
-function cdxc_sync_bits()
-{
-
-    $c_type = $_REQUEST['c_type'];
-    $bit_type = $_REQUEST['bit_type'];
-    $c_name = $_REQUEST['c_name'];
-    $file_loc = $_REQUEST['file_loc'];
-    $bit_name = $_REQUEST['bit_name'];
-
-    if($bit_type=='function'){
-        cdxc_sync_function($file_loc,$bit_name,$c_name,$c_type);
-    }elseif($bit_type=='action'){
-        cdxc_sync_action($file_loc,$bit_name,$c_name,$c_type);
-    }
-    elseif($bit_type=='filter'){
-        cdxc_sync_filter($file_loc,$bit_name,$c_name,$c_type);
-    }
-
-    die();
-}
-
-// add function to ajax
-add_action('wp_ajax_cdxc_sync_bits', 'cdxc_sync_bits');
-
 
 
 function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
@@ -1031,7 +1000,7 @@ function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
  * Ajax function to calculate the total posts for a project.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_calc_project_posts()
 {
@@ -1064,7 +1033,7 @@ add_action('wp_ajax_cdxc_calc_project_posts', 'cdxc_calc_project_posts');
  * Ajax function to build the page content from saved metadata.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_create_content_ajax()
 {
@@ -1098,7 +1067,7 @@ add_action('wp_ajax_cdxc_create_content_ajax', 'cdxc_create_content_ajax');
  * Returns an array of supported DocBlocks.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @return array The DocBlocks supported by Codex Creator as an array (SLUG => NAME).
  */
 function cdxc_suported_docblocks()

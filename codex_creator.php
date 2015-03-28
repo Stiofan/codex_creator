@@ -3,7 +3,7 @@
  * This is the main Codex Creator plugin file
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /*
@@ -24,85 +24,43 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(-1);
 
-
-/**
- * zzzzxxx change Stores the GeoDirectory widget locations in the theme widget areas.
- *
- * zzzzxxx change This function loops through the GeoDirectory widgets and saves their locations in the widget areas to an option
- * so they can be restored later. This is called via hook.
- *
- *    add_action('switch_theme', 'geodir_store_sidebars');
- *
- * @since 1.0.0
- * @package GeoDirectory
+/*
+ * Don't allow direct access to this file.
  */
-function testing_yo()
-{
-    $nothing = '';
-    /**
-     * Nothing filter.
-     *
-     * @since 1.0.0
-     * @param string $nothing Nothing.
-     */
-    $nothing = apply_filters('nothing_filter',$nothing);
-    return $nothing;
-
-}
-
-
-/**
- * Get nothing.
- *
- * This function returns a empty string that can be filtered.
- *
- * @uses 'nothing_filter' Filters the nothing variable before return.
- * @uses 'nothing_action' Action called just before the return.
- * @since 1.0.0
- * @since 1.0.1 Added the 'nothing_action' action.
- * @return string The filtered nothing string.
- */
-function ex_get_nothing(){
-    $nothing = '';
-    /**
-     * Nothing filter.
-     *
-     * @since 1.0.0
-     * @param string $nothing Empty string.
-     */
-    $nothing = apply_filters('nothing_filter',$nothing);
-
-    /**
-     * Action before the return value of the {@see ex_get_nothing()} function.
-     *
-     * @since 1.0.1
-     * @param string $nothing Empty string.
-     */
-    do_action('nothing_action',$nothing);
-    return $nothing;
-}
-
 if (!defined('ABSPATH')) exit;
 
 /**
- * Define constants
+ * Defines the plugins constants.
+ *
+ * This is wrapped in a function and called on the 'plugins_loaded' hook so it can easily be changed.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
  */
-define('CDXC_VERSION', '1.0.0');
-define('CDXC_ROOT', __FILE__);
-define('CDXC_ROOT_DOC', __DIR__);
-define('CDXC_TEXTDOMAIN', 'codex_creator');
-define('CDXC_URL', plugin_dir_url(CDXC_ROOT));
+function cdxc_define_constants()
+{
+    /*
+     * Define constants
+     */
+    if (!defined('CDXC_VERSION')) define('CDXC_VERSION', '1.0.0');
+    if (!defined('CDXC_ROOT')) define('CDXC_ROOT', __FILE__);
+    if (!defined('CDXC_ROOT_DOC')) define('CDXC_ROOT_DOC', __DIR__);
+    if (!defined('CDXC_TEXTDOMAIN')) define('CDXC_TEXTDOMAIN', 'codex_creator');
+    if (!defined('CDXC_URL')) define('CDXC_URL', plugin_dir_url(CDXC_ROOT));
 
-define('CDXC_TITLE_START', "<h4>");
-define('CDXC_TITLE_END', "</h4>");
-define('CDXC_CONTENT_START', "<p>");
-define('CDXC_CONTENT_END', "</p>");
+    if (!defined('CDXC_TITLE_START')) define('CDXC_TITLE_START', "<h4>");
+    if (!defined('CDXC_TITLE_END')) define('CDXC_TITLE_END', "</h4>");
+    if (!defined('CDXC_CONTENT_START')) define('CDXC_CONTENT_START', "<p>");
+    if (!defined('CDXC_CONTENT_END')) define('CDXC_CONTENT_END', "</p>");
 
-define('CDXC_PHP_CODE_START', "<pre>");
-define('CDXC_PHP_CODE_END', "</pre>");
+    if (!defined('CDXC_PHP_CODE_START')) define('CDXC_PHP_CODE_START', "<pre>");
+    if (!defined('CDXC_PHP_CODE_END')) define('CDXC_PHP_CODE_END', "</pre>");
 
-define('CDXC_SAMPLE_OPEN', "<pre>");
-define('CDXC_SAMPLE_CLOSE', "</pre>");
+    if (!defined('CDXC_SAMPLE_OPEN')) define('CDXC_SAMPLE_OPEN', "<pre>");
+    if (!defined('CDXC_SAMPLE_CLOSE')) define('CDXC_SAMPLE_CLOSE', "</pre>");
+}
+
+add_action('plugins_loaded','cdxc_define_constants');
 
 
 
@@ -111,11 +69,10 @@ define('CDXC_SAMPLE_CLOSE', "</pre>");
 /**
  * DocBlock Class for reading DocBlocks
  */
-
 function cdxc_autoload($className)
 {
 
-    if (strpos($className,'phpDocumentor') === false && strpos($className,'PhpParser') === false ) {
+    if (strpos($className,'phpDocumentor\\') === false && strpos($className,'PhpParser\\') === false ) {
         return;
     }
 
@@ -141,14 +98,12 @@ function cdxc_autoload($className)
 
 spl_autoload_register('cdxc_autoload');
 
-//include_once('phpDocumentor/Reflection/DocBlock.php');
 
 
 
 /*
  * include only what we need from phpdocumentor.
  */
-
 $cdxc_docblock_include_arr = array(
     "/phpDocumentor/Reflection/DocBlock/Description.php",
     "/phpDocumentor/Reflection/DocBlock/Tag.php",
@@ -177,7 +132,6 @@ foreach ($cdxc_docblock_include_arr as $cdx_inc) {
     require_once(CDXC_ROOT_DOC . $cdx_inc);
 }
 */
-
 
 
 
@@ -223,28 +177,3 @@ include_once('lib/file_functions.php');
  */
 include_once('lib/add_meta_boxes.php');
 
-/*
-echo '###';
-$code_src = cdxc_get_file('/home/stiofan/public_html/wp-content/plugins/test_pluing/test_pluing.php');
-echo $code_src ;
-cdxc_get_parse_file($code_src);
-*/
-
-
-/*
-//$code = '<?php echo "hi"; // some code';
-//$code =  cdxc_get_file('/home/stiofan/public_html/wp-content/plugins/codex_creator/codex_creator.php');
-$code =  cdxc_get_file('/home/stiofan/public_html/wp-content/plugins/hello.php');
-
-$parser = new PhpParser\Parser(new PhpParser\Lexer\Emulative);
-$nodeDumper = new PhpParser\NodeDumper;
-
-try {
-    $stmts = $parser->parse($code);
-    // $stmts is an array of statement nodes
-    //echo $nodeDumper->dump($stmts), "\n";
-} catch (PhpParser\Error $e) {
-    echo 'Parse Error: ', $e->getMessage();
-}
-
-print_r($stmts);

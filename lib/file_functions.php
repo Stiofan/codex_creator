@@ -3,13 +3,13 @@
  * Functions for dealing with files on the server
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /**
  * Returns an array of allowed file types.
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @return array An array of allowed file types.
  */
 function cdxc_allowed_file_types()
@@ -21,7 +21,7 @@ function cdxc_allowed_file_types()
  * Get the contents of a file on the server as a variable.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file The absolute path of the file.
  * @return mixed The contents of the file if successful. False on failure.
  */
@@ -38,7 +38,7 @@ function cdxc_get_file($file)
  * Get the contents of a file on the server as an array of file lines.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file The absolute path of the file.
  * @return mixed The contents of the file as an array if successful. False on failure.
  */
@@ -55,7 +55,7 @@ function cdxc_get_file_array($file)
  * Check if a file has a DocBlock and if so return it.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file_path The absolute path of the file.
  * @return bool|string The DocBlock if successful. False on failure.
  */
@@ -82,7 +82,7 @@ function cdxc_has_file_docblock($file_path)
  *    array('DOCBLOCK_CONTENT','FUNCTION_NAME','FUNCTION_LINE_NUMBER');
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file_path The absolute path of the file.
  * @return array|bool The array of DocBlock info if successful. False if no functions present in file.
  */
@@ -138,7 +138,7 @@ function cdxc_get_file_functions_arr($file)
  * Returns a unordered list of functions from a file for further use by ajax functions.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file_path The absolute path of the file.
  * @return string Returns li elements of functions. Empty string if no functions present
  */
@@ -169,7 +169,7 @@ function cdxc_get_file_functions($file)
  * Read and return the file DocBlock from a file.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param array $lines A array of lines from a file.
  * @return bool|string Returns a string of the DocBlock on success. False if no DocBlock.
  */
@@ -231,7 +231,7 @@ function cdxc_get_file_docblock($lines)
  *    array('DOCBLOCK_CONTENT','ACTION_NAME','ACTION_LINE_NUMBER');
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file_path The absolute path of the file.
  * @return array|bool The array of DocBlock info if successful. False if no actions present in file.
  */
@@ -299,7 +299,7 @@ function cdxc_get_file_actions_arr($file)
  * Outputs a unordered list of actions from a file for further use by ajax functions.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file_path The absolute path of the file.
  * @return string Returns li elements of actions. Empty string if no actions present
  */
@@ -333,7 +333,7 @@ function cdxc_get_file_actions($file)
  *    array('DOCBLOCK_CONTENT','FILTER_NAME','FILTER_LINE_NUMBER');
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file_path The absolute path of the file.
  * @return array|bool The array of DocBlock info if successful. False if no filters present in file.
  */
@@ -420,7 +420,7 @@ function cdxc_get_file_filters_arr($file)
  * Outputs a unordered list of filters from a file for further use by ajax functions.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file_path The absolute path of the file.
  * @return string Returns li elements of filters. Empty string if no filters present
  */
@@ -466,11 +466,11 @@ function cdxc_get_parse_file($file){
 
 function cdxc_parse_file_for_file($file,$c_name,$c_type)
 {
-
+    global $cdxc_functions_arr,$cdxc_actions_arr,$cdxc_filters_arr;
     $stmts = cdxc_get_parse_file($file);
-    $functions_arr = array();
-    $actions_arr = array();
-    $filters_arr = array();
+    $cdxc_functions_arr = array();
+    $cdxc_actions_arr = array();
+    $cdxc_filters_arr = array();
     if(!is_array($stmts)){echo $stmts;exit;}
     else{
         $file_arr = cdxc_get_file_array($file);
@@ -486,186 +486,8 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
              * If a main function.
              */
             if($part->getType()=='Stmt_Function'){
-
-                $func = array();
-
-                $doc_com =  $part->getDocComment();
-                if(is_object($doc_com)){
-                    $doc_com = $part->getDocComment()->getText();
-                }
-
-                $func[0] = $doc_com;
-                $func[1] = $part->name;
-                $func[2] = $part->getLine();
-                $functions_arr[]=$func;
-
-
-                $hooks_arr = array();
-                foreach ($part->stmts as $func_part) {
-
-                    //echo $func_part->getType()." \n\r";
-                    //print_r($func_part);
-                    //echo '@@#####################################'." \n\r";
-
-                    if($func_part->getType()=='Expr_Assign' && isset($func_part->expr->name->parts[0]) && $func_part->expr->name->parts[0]=='apply_filters' ){// check for apply filters being assigned to var
-                       // echo '@@@@@@@@@@@@@@@#####################################'." \n\r";
-
-                        //print_r($func_part);
-                        $hook_doc_com =  $func_part->getDocComment();
-                        if(is_object($hook_doc_com)){
-                            $hook_doc_com = $func_part->getDocComment()->getText();
-                        }
-
-                        /*
-                         * Build the source code section.
-                         */
-                        $hook_start = $func_part->getLine();
-                        $hook_end = $func_part->getAttribute('endLine');
-                        $code = '';
-                        if($hook_start){$line = $hook_start-1;$hook_end=$hook_end-1;}else{$line = $hook_start;}
-                        if ($line && $hook_end) {
-                            if ($hook_start == $hook_end) {
-                                $code = $file_arr[$line];
-                            } else {
-
-                                while ($line <= $hook_end) {
-                                    $code .= $file_arr[$line];
-                                    $line++;
-                                }
-                            }
-                        }
-                        $code = addslashes_gpc($code);
-
-
-
-
-                        $actn_name = cdxc_get_hook_name($func_part);
-
-                        $hooks = array();
-                        $hooks[0] = $hook_doc_com;
-                        $hooks[1] = $actn_name;//$func_part->expr->args[0]->value->value;
-                        $hooks[2] = $func_part->getLine();
-                        $hooks[3] = 'filter';
-                        $hooks_arr[]=$hooks;
-                        //print_r($hooks);
-                        $filters_arr[]=$hooks;
-                        cdxc_sync_filter($file,$hooks,$c_name,$func,$c_type,$code);
-                    }
-                    elseif($func_part->getType()=='Stmt_Echo' && isset($func_part->exprs[0]->name->parts[0]) && $func_part->exprs[0]->name->parts[0]=='apply_filters' ){// check for apply filters being assigned to var
-                        //echo '@@@@@@@@@@@@@@@#####################################'." \n\r";
-                        //print_r($func_part);
-                        $hook_doc_com =  $func_part->getDocComment();
-                        if(is_object($hook_doc_com)){
-                            $hook_doc_com = $func_part->getDocComment()->getText();
-                        }
-
-                        /*
-                         * Build the source code section.
-                         */
-                        $hook_start = $func_part->getLine();
-                        $hook_end = $func_part->getAttribute('endLine');
-                        $code = '';
-                        if($hook_start){$line = $hook_start-1;$hook_end=$hook_end-1;}else{$line = $hook_start;}
-                        if ($line && $hook_end) {
-                            if ($hook_start == $hook_end) {
-                                $code = $file_arr[$line];
-                            } else {
-                                while ($line <= $hook_end) {
-                                    $code .= $file_arr[$line];
-                                    $line++;
-                                }
-                            }
-                        }
-
-                        $code = addslashes_gpc($code);
-
-
-
-                        $actn_name = cdxc_get_hook_name($func_part);
-
-                        $hooks = array();
-                        $hooks[0] = $hook_doc_com;
-                        $hooks[1] = $actn_name ;//$func_part->exprs[0]->args[0]->value->value;
-                        $hooks[2] = $func_part->getLine();
-                        $hooks[3] = 'filter';
-                        $hooks_arr[]=$hooks;
-                        //print_r($hooks);
-                        $filters_arr[]=$hooks;
-                        cdxc_sync_filter($file,$hooks,$c_name,$func,$c_type,$code);
-                    }
-                    elseif($func_part->getType()=='Expr_FuncCall' && isset($func_part->name->parts[0]) && $func_part->name->parts[0]=='do_action') {
-
-                        $hook_doc_com =  $func_part->getDocComment();
-                        if(is_object($hook_doc_com)){
-                            $hook_doc_com = $func_part->getDocComment()->getText();
-                        }
-
-                        /*
-                         * Build the source code section.
-                         */
-                        $hook_start = $func_part->getLine();
-                        $hook_end = $func_part->getAttribute('endLine');
-                        $code = '';
-                        if($hook_start){$line = $hook_start-1; $hook_end=$hook_end-1;}else{$line = $hook_start;}
-                        if ($line && $hook_end) {
-                            if ($hook_start == $hook_end) {
-                                $code = $file_arr[$line];
-                            } else {
-                                while ($line <= $hook_end) {
-                                    $code .= $file_arr[$line];
-                                    $line++;
-                                }
-                            }
-                        }
-                        $code = addslashes_gpc($code);
-
-
-
-                        $actn_name = cdxc_get_hook_name($func_part);
-
-                        $hooks = array();
-                        $hooks[0] = $hook_doc_com;
-                        $hooks[1] = $actn_name;
-                        $hooks[2] = $func_part->getLine();
-                        $hooks[3] = 'action';
-                        $hooks_arr[]=$hooks;
-                        $actions_arr[]=$hooks;
-                        cdxc_sync_action($file,$hooks,$c_name,$func,$c_type,$code);
-
-                    }
-                }
-
-                /*
-                 * Build the source code section.
-                 */
-                $func_start = $part->getLine();
-                $func_end = $part->getAttribute('endLine');
-                $code = '';
-
-                if($func_start){$line = $func_start-1; $func_end = $func_end-1;}else{$line = $func_start;}
-                if ($line && $func_end) {
-                    if ($func_start == $func_end) {
-                        $code = $file_arr[$line];
-                    } else {
-                        while ($line <= $func_end) {
-                            $code .= $file_arr[$line];
-                            $line++;
-                        }
-                    }
-                }
-                $code = addslashes_gpc($code);
-
-
-
-
-                /*
-                 * save the function
-                 */
-                cdxc_sync_function($file,$func,$c_name,$hooks_arr,$c_type,$code);
-
-
-            }elseif($part->getType()=='Stmt_Function'){
-
+                cdxc_find_function_hooks($file,$c_name,$c_type,$part,$file_arr);
+            }else{
 
             }
         }
@@ -674,9 +496,210 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
 
    //print_r($functions_arr);
 
-    $ele = array($functions_arr, $actions_arr, $filters_arr);
+    $ele = array($cdxc_functions_arr, $cdxc_actions_arr, $cdxc_filters_arr);
     return $ele;
 
 }
 
-//function cdxc_
+function cdxc_find_function_hooks($file,$c_name,$c_type,$part,$file_arr,$parent_func='',$inside_func=false){
+    global $cdxc_functions_arr,$cdxc_actions_arr,$cdxc_filters_arr,$hooks_arr;
+    //print_r($part);exit;
+    $func = array();
+
+    if(!isset($part->stmts)){return;}
+    $doc_com =  $part->getDocComment();
+    if(is_object($doc_com)){
+        $doc_com = $part->getDocComment()->getText();
+    }
+
+    if(!$inside_func) {
+        $func[0] = $doc_com;
+        $func[1] = $part->name;
+        $func[2] = $part->getLine();
+        $cdxc_functions_arr[] = $func;
+    }else{
+        $func = $parent_func;
+    }
+
+
+    foreach ($part->stmts as $func_part) {
+
+        //echo $func_part->getType()." \n\r";
+        //print_r($func_part);
+        //echo '@@#####################################'." \n\r";
+
+        if($func_part->getType()=='Expr_Assign' && isset($func_part->expr->name->parts[0]) && $func_part->expr->name->parts[0]=='apply_filters' ){// check for apply filters being assigned to var
+            // echo '@@@@@@@@@@@@@@@#####################################'." \n\r";
+
+            //print_r($func_part);
+            $hook_doc_com =  $func_part->getDocComment();
+            if(is_object($hook_doc_com)){
+                $hook_doc_com = $func_part->getDocComment()->getText();
+            }else{
+                $hook_doc_com =  $func_part->expr->getDocComment();
+                if(is_object($hook_doc_com)){
+                    $hook_doc_com = $func_part->expr->getDocComment()->getText();
+                }
+            }
+
+            /*
+             * Build the source code section.
+             */
+            $hook_start = $func_part->getLine();
+            $hook_end = $func_part->getAttribute('endLine');
+            $code = '';
+            if($hook_start){$line = $hook_start-1;$hook_end=$hook_end-1;}else{$line = $hook_start;}
+            if ($line && $hook_end) {
+                if ($hook_start == $hook_end) {
+                    $code = $file_arr[$line];
+                } else {
+
+                    while ($line <= $hook_end) {
+                        $code .= $file_arr[$line];
+                        $line++;
+                    }
+                }
+            }
+            $code = addslashes_gpc($code);
+
+
+
+
+            $actn_name = cdxc_get_hook_name($func_part);
+
+            $hooks = array();
+            $hooks[0] = $hook_doc_com;
+            $hooks[1] = $actn_name;//$func_part->expr->args[0]->value->value;
+            $hooks[2] = $func_part->getLine();
+            $hooks[3] = 'filter';
+            $hooks_arr[]=$hooks;
+            //print_r($hooks);
+            if($actn_name=='geodir_detail_page_sidebar_content'){
+               // print_r($hooks);
+               //print_r($func_part);
+                //print_r($func_part->getAttributes());
+            }
+            $cdxc_filters_arr[]=$hooks;
+            cdxc_sync_filter($file,$hooks,$c_name,$func,$c_type,$code);
+        }
+        elseif($func_part->getType()=='Stmt_Echo' && isset($func_part->exprs[0]->name->parts[0]) && $func_part->exprs[0]->name->parts[0]=='apply_filters' ){// check for apply filters being assigned to var
+            //echo '@@@@@@@@@@@@@@@#####################################'." \n\r";
+            //print_r($func_part);
+            $hook_doc_com =  $func_part->getDocComment();
+            if(is_object($hook_doc_com)){
+                $hook_doc_com = $func_part->getDocComment()->getText();
+            }
+
+            /*
+             * Build the source code section.
+             */
+            $hook_start = $func_part->getLine();
+            $hook_end = $func_part->getAttribute('endLine');
+            $code = '';
+            if($hook_start){$line = $hook_start-1;$hook_end=$hook_end-1;}else{$line = $hook_start;}
+            if ($line && $hook_end) {
+                if ($hook_start == $hook_end) {
+                    $code = $file_arr[$line];
+                } else {
+                    while ($line <= $hook_end) {
+                        $code .= $file_arr[$line];
+                        $line++;
+                    }
+                }
+            }
+
+            $code = addslashes_gpc($code);
+
+
+
+            $actn_name = cdxc_get_hook_name($func_part);
+
+            $hooks = array();
+            $hooks[0] = $hook_doc_com;
+            $hooks[1] = $actn_name ;//$func_part->exprs[0]->args[0]->value->value;
+            $hooks[2] = $func_part->getLine();
+            $hooks[3] = 'filter';
+            $hooks_arr[]=$hooks;
+            //print_r($hooks);
+            $cdxc_filters_arr[]=$hooks;
+            cdxc_sync_filter($file,$hooks,$c_name,$func,$c_type,$code);
+        }
+        elseif($func_part->getType()=='Expr_FuncCall' && isset($func_part->name->parts[0]) && $func_part->name->parts[0]=='do_action') {
+
+            $hook_doc_com =  $func_part->getDocComment();
+            if(is_object($hook_doc_com)){
+                $hook_doc_com = $func_part->getDocComment()->getText();
+            }
+
+            /*
+             * Build the source code section.
+             */
+            $hook_start = $func_part->getLine();
+            $hook_end = $func_part->getAttribute('endLine');
+            $code = '';
+            if($hook_start){$line = $hook_start-1; $hook_end=$hook_end-1;}else{$line = $hook_start;}
+            if ($line && $hook_end) {
+                if ($hook_start == $hook_end) {
+                    $code = $file_arr[$line];
+                } else {
+                    while ($line <= $hook_end) {
+                        $code .= $file_arr[$line];
+                        $line++;
+                    }
+                }
+            }
+            $code = addslashes_gpc($code);
+
+
+
+            $actn_name = cdxc_get_hook_name($func_part);
+
+            $hooks = array();
+            $hooks[0] = $hook_doc_com;
+            $hooks[1] = $actn_name;
+            $hooks[2] = $func_part->getLine();
+            $hooks[3] = 'action';
+            $hooks_arr[]=$hooks;
+            $cdxc_actions_arr[]=$hooks;
+            cdxc_sync_action($file,$hooks,$c_name,$func,$c_type,$code);
+
+        }else{
+            // if we don't find it on the first run then loop through any other parts
+            cdxc_find_function_hooks($file,$c_name,$c_type,$func_part,$file_arr,$func,true);
+        }
+    }
+
+    if($inside_func){return;}
+
+    /*
+     * Build the source code section.
+     */
+    $func_start = $part->getLine();
+    $func_end = $part->getAttribute('endLine');
+    $code = '';
+
+    if($func_start){$line = $func_start-1; $func_end = $func_end-1;}else{$line = $func_start;}
+    if ($line && $func_end) {
+        if ($func_start == $func_end) {
+            $code = $file_arr[$line];
+        } else {
+            while ($line <= $func_end) {
+                $code .= $file_arr[$line];
+                $line++;
+            }
+        }
+    }
+    $code = addslashes_gpc($code);
+
+
+
+
+    /*
+     * save the function
+     */
+    cdxc_sync_function($file,$func,$c_name,$hooks_arr,$c_type,$code);
+    $hooks_arr = array();
+
+
+
+}

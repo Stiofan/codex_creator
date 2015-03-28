@@ -3,7 +3,7 @@
  * Setup new section in WordPress tools and add our HTML
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 
@@ -11,7 +11,7 @@
  * Add menu item to the WordPress tools section.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function register_my_custom_submenu_page()
 {
@@ -22,7 +22,7 @@ function register_my_custom_submenu_page()
  * Content of the main page for Codex Creator
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_main_page()
 {
@@ -81,7 +81,7 @@ add_action('admin_menu', 'register_my_custom_submenu_page');
  * Adds the JS and CSS files to the WordPress backend.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_admin_scripts()
 {

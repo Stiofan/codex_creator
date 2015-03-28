@@ -3,7 +3,7 @@
  * Setup codex_creator CPT and it's taxonomies
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /**
@@ -12,7 +12,7 @@
  * This function creates the custom post type, the project categories and also the version numbers as tags.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_create_posttype()
 {
@@ -119,7 +119,7 @@ add_filter('post_type_link', 'cdxc_permalink', 1, 3);
  * Rewrite the codex permalink to include the sub category name instead of the main category name
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @internal This is never called direct
  *
  * @param $permalink

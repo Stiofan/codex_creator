@@ -3,14 +3,14 @@
  * Mostly small functions mostly used to run checks
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /**
  * Check if a project exists or not.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $el The name of the project, plugin or theme name.
  * @return bool Return true if exists. False if not exists.
  */
@@ -30,7 +30,7 @@ function cdxc_has_codex($el)
  * Used in step 3 above the file tree, this outputs the status of the project and lets the user add the project or do further actions via ajax.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string Optional. $type Not yet implemented, will be either ('plugin','theme').
  * @param string $el This is the name of the project, the name of the plugin or theme.
  */
@@ -66,7 +66,7 @@ function cdxc_status_text($type, $el)
  * Checks if a file is in the allowed file types.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $file The name of the file, eg: functions.php.
  * @return bool True if allowed. False if not allowed.
  */
@@ -84,7 +84,7 @@ function cdxc_is_allowed_file($file)
  * Generated the post content from the post metadata and updates the post content with it.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id The post id to run.
  */
 function cdxc_codex_create_content($post_id)
@@ -119,7 +119,7 @@ function cdxc_codex_create_content($post_id)
  * Checks if a post exists for the given project.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param string $title The title of the post to check.
  * @param string $cat The name of the project to check.
  * @param string $type The type of item to check.
@@ -152,7 +152,9 @@ function cdxc_post_exits($title, $cat,$type)
 }
 
 
-
+/*
+ * we do it this way because the src gets strip slashes which can alter the src like "\n" changes to "n"
+ */
 add_filter( 'the_content', 'cdxc_add_code_src',5 );
 /**
  * Add a icon to the beginning of every post page.

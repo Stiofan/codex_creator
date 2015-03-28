@@ -3,14 +3,14 @@
  * Functions for adding metaboxes to the codex CPT
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /**
  * Adds a box to the main section on the Post and Page edit screens.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_add_meta_box()
 {
@@ -51,7 +51,7 @@ add_action('add_meta_boxes', 'cdxc_add_meta_box');
  * Outputs the custom meta boxes on the edit post page for Codex Creator CPT
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int|WP_Post $post The object for the current post/page.
  */
 function cdxc_meta_box_callback($post)
@@ -101,7 +101,7 @@ function cdxc_meta_box_callback($post)
  * When the post is saved, this saves our custom data.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int $post_id The ID of the post being saved.
  */
 function cdxc_save_meta_box_data($post_id)
@@ -175,7 +175,7 @@ add_action('save_post', 'cdxc_save_meta_box_data');
  * Adds new usage custom input box to edit post page for Codex Creator CPT.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int|WP_Post $post The post object.
  */
 function cdxc_meta_box_usage_callback($post)
@@ -193,7 +193,7 @@ function cdxc_meta_box_usage_callback($post)
  * Adds new example custom input box to edit post page for Codex Creator CPT.
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  * @param int|WP_Post $post The post object.
  */
 function cdxc_meta_box_example_callback($post)

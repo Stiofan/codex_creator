@@ -2,7 +2,7 @@
  * JavaScript for the backend
  *
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 
 /**
@@ -11,7 +11,7 @@
  * @todo make coming soon text translatable
  * @param cType
  * @since 1.0.0
- * @package Codex Creator
+ * @package Codex_Creator
  */
 function cdxc_step_1(cType) {
 
@@ -139,6 +139,9 @@ function cdxc_sync_project_files($type, $el, $last) {
         }
 
         cc_curent_sync_file = this;
+        jQuery(cc_curent_sync_file).find("i.fa").first().removeClass('fa-file-code-o');
+        jQuery(cc_curent_sync_file).find("i.fa").first().addClass('fa-cog fa-spin');
+
 
         //move screen to show progress
         cdxc_scroll_to(cc_curent_sync_file);
@@ -160,13 +163,15 @@ function cdxc_sync_project_files($type, $el, $last) {
                 console.log(data);
 
                 jQuery(cc_curent_sync_file).css('background-color', 'lightcyan');
+                jQuery(cc_curent_sync_file).find("i.fa").first().addClass('fa-file-code-o');
+                jQuery(cc_curent_sync_file).find("i.fa").first().removeClass('fa-cog fa-spin');
 
 
                 if (index === total_files - 1) {
-                    // this is the last one
-                    cdxc_sync_project_file_code_bits($type, $el, cc_curent_sync_file, 1);
-                } else {
-                    cdxc_sync_project_file_code_bits($type, $el, cc_curent_sync_file, 0);
+                    // this is the last one, so now we sync
+                    cdxc_calc_project_posts($type, $el);
+                }else{
+                    cdxc_sync_project_files($type, $el);
                 }
 
             },
@@ -182,89 +187,6 @@ function cdxc_sync_project_files($type, $el, $last) {
 
 }
 
-cc_curent_sync_function = '';
-function cdxc_sync_project_file_code_bits($type, $el, $file, $last) {
-    if (!$type || !$el) {
-        return;
-    }// bail if no type
-
-    funcsP = jQuery($file).next();
-
-    if (1==2 && funcsP.attr("class") == 'cc-code-bits-tree') {// if the file has code bits
-        var total_func = jQuery(funcsP).children(".cc-file-tree-code-bit").length;
-        jQuery(funcsP).children(".cc-file-tree-code-bit").each(function (index) {
-
-            //jQuery( this ).css('background-color', 'lightblue');
-
-
-            if (jQuery(this).data('sync') == 1) {
-                return true;
-            }
-
-            cc_curent_sync_function = this;
-
-            //move screen to show progress
-            cdxc_scroll_to(cc_curent_sync_function);
-
-            file_loc = jQuery(this).data('cc-scan-file');
-            bit_name = jQuery(this).data('cc-scan-bit');
-            bit_type = jQuery(this).data('cc-bit-type');
-
-            // This does the ajax request
-            jQuery.ajax({
-                url: ajaxurl,
-                data: {
-                    'action': 'cdxc_sync_bits',
-                    'c_type': $type,
-                    'c_name': $el,
-                    'file_loc': file_loc,
-                    'bit_name': bit_name,
-                    'bit_type': bit_type
-                },
-                success: function (data) {
-                    jQuery(this).data('sync', 1);
-                    console.log(data);
-
-                    jQuery(cc_curent_sync_function).css('background-color', 'lightblue');
-
-                    if (index === total_func - 1) {
-                        // this is the last one
-
-                        if ($last) {
-                            //alert('done0');
-                            cdxc_calc_project_posts($type, $el);
-
-                        } else {
-                            cdxc_sync_project_files($type, $el);
-                        }
-
-                    } else {
-                        cdxc_sync_project_file_code_bits($type, $el, $file, $last);
-                    }
-                },
-                error: function (errorThrown) {
-                    console.log(errorThrown);
-                }
-            });
-
-            jQuery(this).data('sync', 1);
-            return false;
-
-
-        });
-
-
-    } else {// else continue to next file;
-        if ($last) {
-            cdxc_calc_project_posts($type, $el);
-
-        } else {
-            cdxc_sync_project_files($type, $el);
-        }
-    }
-
-
-}
 
 
 function cdxc_calc_project_posts($type, $el) {
@@ -332,7 +254,7 @@ function cdxc_create_codex_content($type, $el, $count, $post_id) {
 function cdxc_create_loading_bar_content($count) {
 
     // @todo make this string translatable
-    loading_div = '<h4>Please wait while we cross reference each file/function and build the page content.</h4>' +
+    loading_div = '<h4>Please wait while we cross reference everything and build the page content.</h4>' +
     '<div class="cc-loading-div" data-count="' + $count + '">' +
     '<div class="cc-loading-progress cc-loading-progress-striped cc-active"  style="width:0%">' +
     '0%' +
