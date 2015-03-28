@@ -140,9 +140,8 @@ function cdxc_scan_output($files, $path, $folder = '')
         //print_r($file);
 
         if ($file['type'] == 'd') {// directory
-
-            //skip hidden directories
-            if (substr($file['name'], 0, 1) === '.') {
+            //skip hidden directories and directories containing .ccignore or ccignore.txt
+            if (substr($file['name'], 0, 1) === '.' || isset($file['files']['.ccignore']) || isset($file['files']['ccignore.txt'])) {
                 continue;
             }
 
@@ -406,7 +405,7 @@ function cdxc_sync_file()
     update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
 
 
-    $els = cdxc_parse_file_for_file($file_loc,$c_name,$c_type);
+    $els = cdxc_parse_file($file_loc,$c_name,$c_type);
 
     $func_arr = $els[0];
     if (!empty($func_arr)) {
@@ -502,7 +501,18 @@ function cdxc_sync_file()
 // add function to ajax
 add_action('wp_ajax_cdxc_sync_file', 'cdxc_sync_file');
 
-
+/**
+ * Add or update a project function reference.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $file_loc Absolute path to the file.
+ * @param array $func An array containing the function DocBlock, name and starting line number.
+ * @param string $c_name Project name.
+ * @param array $hooks_arr An array of hooks contained in the function, contains DocBlock, name and starting line number.
+ * @param string $c_type Project type plugin|theme.
+ * @param string $code Source code of the function.
+ */
 function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
 {
     // check file is in plugin dir
@@ -593,7 +603,7 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
     update_post_meta($post_id, 'cdxc_meta_type', 'function'); // file || function etc
     update_post_meta($post_id, 'cdxc_meta_path', $file_path); // path to file
     update_post_meta($post_id, 'cdxc_meta_line', $found_func[2]); // line at which function starts
-    update_post_meta($post_id, 'cdxc_meta_code', $code); // the sorce code of the function
+    update_post_meta($post_id, 'cdxc_meta_code', $code); // the source code of the function
 
 
     if(!empty($hooks_arr)){
@@ -678,6 +688,19 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
 
 }
 
+
+/**
+ * Add or update a project action reference.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $file_loc Absolute path to the file.
+ * @param array $hooks An array containing the action DocBlock, name and starting line number.
+ * @param string $c_name Project name.
+ * @param array $func An array containing the function DocBlock, name and starting line number.
+ * @param string $c_type Project type plugin|theme.
+ * @param string $code Source code of the action.
+ */
 function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
 {
     // check file is in plugin dir
@@ -836,6 +859,18 @@ function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
 
 }
 
+/**
+ * Add or update a project filter reference.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $file_loc Absolute path to the file.
+ * @param array $hooks An array containing the filter DocBlock, name and starting line number.
+ * @param string $c_name Project name.
+ * @param array $func An array containing the function DocBlock, name and starting line number.
+ * @param string $c_type Project type plugin|theme.
+ * @param string $code Source code of the filter.
+ */
 function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
 {
     // check file is in plugin dir
@@ -1106,7 +1141,13 @@ function cdxc_suported_docblocks()
     return $dock_blocks;
 }
 
-
+/**
+ * Prefix the post title with File|Function|Action|Filter Reference via 'the_title' filter.
+ *
+ * @param string $title Title of the post.
+ * @param null $id ID of the post.
+ * @return string The altered title.
+ */
 function cdxc_add_title_ref( $title, $id = null ) {
 
     $post_obj = get_queried_object();
@@ -1116,6 +1157,10 @@ function cdxc_add_title_ref( $title, $id = null ) {
             $title= __('File Reference', CDXC_TEXTDOMAIN).': '.$title;
         } elseif (get_post_meta($id,'cdxc_meta_type', true) == 'function') {
             $title= __('Function Reference', CDXC_TEXTDOMAIN).': '.$title;
+        } elseif (get_post_meta($id,'cdxc_meta_type', true) == 'action') {
+            $title= __('Action Reference', CDXC_TEXTDOMAIN).': '.$title;
+        } elseif (get_post_meta($id,'cdxc_meta_type', true) == 'filter') {
+            $title= __('Filter Reference', CDXC_TEXTDOMAIN).': '.$title;
         }
     }
 

@@ -185,7 +185,12 @@ function cdxc_add_code_src( $content ) {
     return $content;
 }
 
-
+/**
+ * Find and format the name of the hook from the parsed object.
+ *
+ * @param object $hook The parsed hook object.
+ * @return string The name of the hook.
+ */
 function cdxc_get_hook_name($hook){
     $name = '';
 
@@ -198,11 +203,6 @@ function cdxc_get_hook_name($hook){
     }elseif(isset($hook->expr->args[0]->value)){
         $root = $hook->expr->args[0]->value;
     }
-
-   // echo '>>>'.$root->getType().'<<<';
-
-
-
 
 
     if($root->getType()=='Scalar_String' && isset($root->value)){
@@ -218,34 +218,14 @@ function cdxc_get_hook_name($hook){
             // pretty print
             $code = $prettyPrinter->prettyPrint($tmp_code);
 
-            //echo '>>>#'.$code.'#<<<';
         } catch (PhpParser\Error $e) {
             echo 'Parse Error: ', $e->getMessage();
         }
 
         $name = str_replace(array(';',' ',' ',"'",'"'),'',$code);
-       // $name = str_replace(array('"',"'"),"'",$name);
-
 
     }
 
-
-
-    /*elseif($root->getType()=='Scalar_Encapsed'){
-        foreach($root->parts as $part){
-            if(is_string($part)){
-                $name .= $part;
-            }elseif($part->getType()=='Expr_Variable'){
-                $name .= "{".'$'.$part->name."}";
-            }
-        }
-
-    }elseif($root->getType()=='Expr_BinaryOp_Concat'){
-
-    }*/
-
-
-    //echo '<<<'.$name.'>>>'." \r\n";
 
     return $name;
 

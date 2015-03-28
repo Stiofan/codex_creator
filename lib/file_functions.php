@@ -445,7 +445,17 @@ function cdxc_get_file_filters($file)
     return $func_content;
 }
 
-
+/**
+ * Parse a PHP file.
+ *
+ * Parses a PHP file into it's different parts using the PHP-Parser class.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @see https://github.com/nikic/PHP-Parser
+ * @param string $file The absolute path to the file.
+ * @return \PhpParser\Node[]|string The file as parsed objects.
+ */
 function cdxc_get_parse_file($file){
 
     $code =  cdxc_get_file($file);
@@ -464,7 +474,17 @@ function cdxc_get_parse_file($file){
     return $stmts;
 }
 
-function cdxc_parse_file_for_file($file,$c_name,$c_type)
+/**
+ * Builds an array of functions, actions and filters from a parsed file object.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $file The absolute path to the file.
+ * @param string $c_name The project name.
+ * @param string $c_type The project type plugin|theme.
+ * @return array An array containing functions, actions and filters starting lines, names and DocBlocks.
+ */
+function cdxc_parse_file($file,$c_name,$c_type)
 {
     global $cdxc_functions_arr,$cdxc_actions_arr,$cdxc_filters_arr;
     $stmts = cdxc_get_parse_file($file);
@@ -474,33 +494,38 @@ function cdxc_parse_file_for_file($file,$c_name,$c_type)
     if(!is_array($stmts)){echo $stmts;exit;}
     else{
         $file_arr = cdxc_get_file_array($file);
-        //print_r($stmts);
+
         foreach($stmts as $part){
-            //print_r($part);
-            //echo $part->getType()." \n\r";
-            //echo $part->name ." \n\r";
-           // echo $part->getDocComment();
-           // print_r($part->getAttributes());
-            //echo '#####################################'." \n\r";
             /*
              * If a main function.
              */
             if($part->getType()=='Stmt_Function'){
                 cdxc_find_function_hooks($file,$c_name,$c_type,$part,$file_arr);
-            }else{
+            }else{// @todo add ability to parse classes also.
 
             }
         }
 
     }
 
-   //print_r($functions_arr);
-
     $ele = array($cdxc_functions_arr, $cdxc_actions_arr, $cdxc_filters_arr);
     return $ele;
 
 }
 
+/**
+ * Find hooks (actions and filters) from a parsed PHP file object.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $file The absolute path to the file.
+ * @param string $c_name Project name.
+ * @param string $c_type Project type plugin|theme.
+ * @param object $part Parsed PHP object part.
+ * @param array $file_arr A array of each line of the file being scanned.
+ * @param string $parent_func Name of the function being scanned.
+ * @param bool $inside_func False by default. True if the $part object is a nested element.
+ */
 function cdxc_find_function_hooks($file,$c_name,$c_type,$part,$file_arr,$parent_func='',$inside_func=false){
     global $cdxc_functions_arr,$cdxc_actions_arr,$cdxc_filters_arr,$hooks_arr;
     //print_r($part);exit;

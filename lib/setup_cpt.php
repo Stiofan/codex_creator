@@ -167,6 +167,15 @@ function cdxc_permalink($permalink, $post_id)
 
 add_filter( 'post_type_archive_link', 'cdxc_permalink_post_type',2,2 );
 
+/**
+ * Adds the main codex project name to the post URL via the 'post_type_archive_link' filter.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $link The post link.
+ * @param string $post_type The posts post type.
+ * @return mixed The link to the codex post with the project added to the URL.
+ */
 function cdxc_permalink_post_type($link, $post_type){
 
     if($post_type=='codex_creator'){
@@ -178,6 +187,15 @@ function cdxc_permalink_post_type($link, $post_type){
 }
 
 add_filter('generate_rewrite_rules', 'cdxc_rewrite_post_type_base');
+
+/**
+ * Add rewrite rules to WordPress to add /codex/ to the start path of the CPT via 'generate_rewrite_rules' filter.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param object $wp_rewrite The WordPress rewrites as an object.
+ * @return mixed The WordPress rewrites object with our rules added.
+ */
 function cdxc_rewrite_post_type_base($wp_rewrite) {
     $newrules = array();
     $newrules['codex/?$'] = 'index.php?post_type=codex_creator';

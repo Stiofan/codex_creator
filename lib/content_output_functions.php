@@ -25,6 +25,14 @@ function cdxc_summary_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_summary_content', $content, $post_id, $title);
 }
 
@@ -80,6 +88,14 @@ function cdxc_description_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_description_content', $content, $post_id, $title);
 }
 
@@ -102,6 +118,14 @@ function cdxc_usage_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_usage_content', $content, $post_id, $title);
 }
 
@@ -124,6 +148,14 @@ function cdxc_access_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_access_content', $content, $post_id, $title);
 }
 
@@ -146,6 +178,14 @@ function cdxc_deprecated_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_deprecated_content', $content, $post_id, $title);
 }
 
@@ -174,7 +214,14 @@ function cdxc_global_content($post_id, $title)
         $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
     }
 
-
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_global_content', $content, $post_id, $title);
 }
 
@@ -197,6 +244,14 @@ function cdxc_internal_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_internal_content', $content, $post_id, $title);
 }
 
@@ -219,6 +274,14 @@ function cdxc_ignore_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_ignore_content', $content, $post_id, $title);
 }
 
@@ -241,6 +304,14 @@ function cdxc_link_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_link_content', $content, $post_id, $title);
 }
 
@@ -263,6 +334,14 @@ function cdxc_method_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_method_content', $content, $post_id, $title);
 }
 
@@ -285,6 +364,14 @@ function cdxc_package_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_package_content', $content, $post_id, $title);
 }
 
@@ -315,6 +402,14 @@ function cdxc_param_content($post_id, $title)
         $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
     }
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_param_content', $content, $post_id, $title);
 }
 
@@ -424,6 +519,14 @@ function cdxc_example_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_example_content', $content, $post_id, $title);
 }
 
@@ -447,6 +550,14 @@ function cdxc_return_content($post_id, $title)
     $meta_value = cdxc_return_content_helper($meta_value);
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_return_content', $content, $post_id, $title);
 }
 
@@ -513,6 +624,14 @@ function cdxc_return_content_helper($value)
     $output .= '</ul>';
     $output .= '</dl>';
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return $output;
 }
 
@@ -545,10 +664,26 @@ function cdxc_see_content($post_id, $title)
         $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
     }
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_see_content', $content, $post_id, $title);
 }
 
-
+/**
+ * Arrange a see value into a usable HTML output.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $value The string value to be used.
+ * @return string Formatted HTML on success.
+ * @todo make this format URL's.
+ */
 function cdxc_see_content_helper($text)
 {
     if ($text == '') {
@@ -556,6 +691,7 @@ function cdxc_see_content_helper($text)
     }
     return $text;
 }
+
 /**
  * Get and format content output for since section of the codex page.
  *
@@ -638,6 +774,14 @@ function cdxc_since_content($post_id, $title)
 
     // print_r($tags_arr);exit;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_since_content', $content, $post_id, $title);
 }
 
@@ -660,6 +804,14 @@ function cdxc_subpackage_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_subpackage_content', $content, $post_id, $title);
 }
 
@@ -682,6 +834,14 @@ function cdxc_todo_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_todo_content', $content, $post_id, $title);
 }
 
@@ -704,6 +864,14 @@ function cdxc_type_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_type_content', $content, $post_id, $title);
 }
 
@@ -726,6 +894,14 @@ function cdxc_uses_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_uses_content', $content, $post_id, $title);
 }
 
@@ -748,6 +924,14 @@ function cdxc_var_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_var_content', $content, $post_id, $title);
 }
 
@@ -791,6 +975,14 @@ function cdxc_functions_content($post_id, $title)
     }
     //$content .= CDXC_CONTENT_START.print_r($meta_value,true).CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_functions_content', $content, $post_id, $title);
 }
 
@@ -835,6 +1027,14 @@ function cdxc_actions_content($post_id, $title)
     }
     //$content .= CDXC_CONTENT_START.print_r($meta_value,true).CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_actions_content', $content, $post_id, $title);
 }
 
@@ -878,6 +1078,14 @@ function cdxc_filters_content($post_id, $title)
     }
     //$content .= CDXC_CONTENT_START.print_r($meta_value,true).CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_filters_content', $content, $post_id, $title);
 }
 
@@ -922,10 +1130,27 @@ function cdxc_location_content($post_id, $title)
         $content .= CDXC_CONTENT_START . $func_name_n . __('is located in', CDXC_TEXTDOMAIN) . ' ' . $meta_value . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $line . ']' . CDXC_CONTENT_END;
     }
 
-
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_location_content', $content, $post_id, $title);
 }
 
+
+/**
+ * Get and format content output for source code section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
 function cdxc_code_content($post_id, $title)
 {
     $content = '';
@@ -940,5 +1165,13 @@ function cdxc_code_content($post_id, $title)
     //$content .= CDXC_PHP_CODE_START . $meta_value . CDXC_PHP_CODE_END;
     $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
 
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
     return apply_filters('cdxc_code_content', $content, $post_id, $title);
 }
