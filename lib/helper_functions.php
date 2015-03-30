@@ -179,6 +179,12 @@ function cdxc_add_code_src( $content ) {
             $content = str_replace("%%CDXC_SRC_CODE%%",$src_code,$content);
         }
 
+    }else{
+        global $post;
+        if($post->post_type=='codex_creator') {
+            $content = str_replace("%%CDXC_SRC_CODE%%",'',$content);
+        }
+
     }
 
     // Returns the content.

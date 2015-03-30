@@ -553,6 +553,15 @@ function cdxc_find_function_hooks($file,$c_name,$c_type,$part,$file_arr,$parent_
         //print_r($func_part);
         //echo '@@#####################################'." \n\r";
 
+
+
+        /*
+         * Incase there is a variable infront of the filter let's re-arrange the object so it can be read properly below.
+         */
+        if ($func_part->getType() == 'Stmt_Echo' && isset($func_part->exprs[0]->expr->name->parts[0]) && $func_part->exprs[0]->expr->name->parts[0] == 'apply_filters') {
+            $func_part->exprs[0] = $func_part->exprs[0]->expr;
+        }
+
         if($func_part->getType()=='Expr_Assign' && isset($func_part->expr->name->parts[0]) && $func_part->expr->name->parts[0]=='apply_filters' ){// check for apply filters being assigned to var
             // echo '@@@@@@@@@@@@@@@#####################################'." \n\r";
 
