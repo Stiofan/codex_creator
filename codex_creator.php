@@ -15,6 +15,9 @@ Author: NomadDevs
 Author URI: http://www.nomaddevs.com/
 */
 
+ini_set('display_errors',1);
+ini_set('display_startup_errors',1);
+error_reporting(-1);
 
 /*
  * Don't allow direct access to this file.

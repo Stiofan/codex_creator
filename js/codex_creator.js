@@ -125,6 +125,7 @@ function cdxc_add_project($type, $el) {
 
 
 cc_curent_sync_file = '';
+cc_first_file = true;
 function cdxc_sync_project_files($type, $el, $last) {
     if (!$type || !$el) {
         return;
@@ -156,12 +157,13 @@ function cdxc_sync_project_files($type, $el, $last) {
                 'action': 'cdxc_sync_file',
                 'c_type': $type,
                 'c_name': $el,
-                'file_loc': file_loc
+                'file_loc': file_loc,
+                'first_file': cc_first_file
             },
             success: function (data) {
                 jQuery(this).data('sync', 1);
                 console.log(data);
-
+                cc_first_file = false;
                 jQuery(cc_curent_sync_file).css('background-color', 'lightcyan');
                 jQuery(cc_curent_sync_file).find("i.fa").first().addClass('fa-file-code-o');
                 jQuery(cc_curent_sync_file).find("i.fa").first().removeClass('fa-cog fa-spin');

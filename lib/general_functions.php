@@ -320,6 +320,11 @@ function cdxc_sync_file()
     $c_type = $_REQUEST['c_type'];// for future we will also do it for themes
     $c_name = $_REQUEST['c_name'];
     $file_loc = $_REQUEST['file_loc'];
+    $first_run = $_REQUEST['first_file'];
+
+    if($first_run){
+        update_option("cdxc_".$c_type."_".$c_name,array());
+    }
 
 
     // check file is in plugin dir
@@ -428,6 +433,11 @@ function cdxc_sync_file()
 
     if ($phpdoc) {
 
+        $dock_blocks = cdxc_suported_docblocks();
+        //first blank the settings
+        /*foreach($dock_blocks as $block=>$block_value){
+            delete_post_meta($post_id, 'cdxc_' . $block);
+        }*/
 
         //summary
         if ($phpdoc->getShortDescription()) {
@@ -632,6 +642,12 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
 
     if ($phpdoc) {
 
+        $dock_blocks = cdxc_suported_docblocks();
+
+        //first blank the settings
+        /*foreach($dock_blocks as $block=>$block_value){
+            delete_post_meta($post_id, 'cdxc_' . $block);
+        }*/
 
         //summary
         if ($phpdoc->getShortDescription()) {
@@ -644,8 +660,7 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
         }
 
 
-        //print_r($phpdoc->getTags());
-        $dock_blocks = cdxc_suported_docblocks();
+
         // save all the function tags
         $tags_used = array();
         foreach ($phpdoc->getTags() as $tag) {
@@ -790,9 +805,11 @@ function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
         $temp_func = $func;
         $func = array();
         $func[0] = $temp_func;
-        update_post_meta($post_id, 'cdxc_meta_functions', $func); // raw docblock
+        update_post_meta($post_id, 'cdxc_meta_functions', ''); // we set this blank as we dont want to show functions anymore, we use used by instead
 
     }
+
+
 
 
     update_post_meta($post_id, 'cdxc_meta_type', 'action'); // file || function etc
@@ -801,29 +818,32 @@ function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
     update_post_meta($post_id, 'cdxc_meta_code', $code); // the sorce code of the function
 
 
+    cdxc_build_project_hooks_tree($c_type,$c_name,$file_loc,$func,'action',$hook_name,$hook_line);
+
+    $used_by = cdxc_get_hook_used_by($c_type,$c_name,'action',$hook_name);
+
+    if(!empty($used_by)){
+        update_post_meta($post_id, 'cdxc_meta_used_by', $used_by); // used by
+    }
+
+
+
     //read and save docblocks
 
     if ($phpdoc) {
 
-
-        //summary
-        if ($phpdoc->getShortDescription()) {
-            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
-        }
-
-        //description
-        if ($phpdoc->getLongDescription()->getContents()) {
-            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
-        }
-
-
-        //print_r($phpdoc->getTags());
         $dock_blocks = cdxc_suported_docblocks();
+
+
+
+
         // save all the function tags
         $tags_used = array();
         foreach ($phpdoc->getTags() as $tag) {
 
             foreach ($dock_blocks as $key => $title) {
+                //first clear the data.
+                //delete_post_meta($post_id, 'cdxc_' . $key);
                 if ($tag->getName() == $key) {
 
                     if (isset($tags_used[$key])) {// if there are multiple tags
@@ -851,6 +871,24 @@ function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
 
             //echo '###'.$tag->getName().'::'.$tag->getContent();
         }
+
+
+
+        //summary
+        if ($phpdoc->getShortDescription()) {
+            // check if it is documented elsewhere
+            if(substr($phpdoc->getShortDescription(), 0, 28) === 'This action is documented in'){
+                return;
+            }
+
+            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
+        }
+
+        //description
+        if ($phpdoc->getLongDescription()->getContents()) {
+            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
+        }
+
 
 
     } else {// no docblock
@@ -960,7 +998,7 @@ function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
         $temp_func = $func;
         $func = array();
         $func[0] = $temp_func;
-        update_post_meta($post_id, 'cdxc_meta_functions', $func); // raw docblock
+        update_post_meta($post_id, 'cdxc_meta_functions', ''); // we set this blank as we dont want to show functions anymore, we use used by instead
 
     }
 
@@ -970,30 +1008,36 @@ function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
     update_post_meta($post_id, 'cdxc_meta_line', $hook_line); // line at which function starts
     update_post_meta($post_id, 'cdxc_meta_code', $code); // the sorce code of the function
 
+    cdxc_build_project_hooks_tree($c_type,$c_name,$file_loc,$func,'filter',$hook_name,$hook_line);
+
+    $used_by = cdxc_get_hook_used_by($c_type,$c_name,'filter',$hook_name);
+
+    if(!empty($used_by)){
+        update_post_meta($post_id, 'cdxc_meta_used_by', $used_by); // used by
+    }
+
+
+
 
     //read and save docblocks
-
     if ($phpdoc) {
-
-
-        //summary
-        if ($phpdoc->getShortDescription()) {
-            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
-        }
-
-        //description
-        if ($phpdoc->getLongDescription()->getContents()) {
-            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
-        }
-
 
         //print_r($phpdoc->getTags());
         $dock_blocks = cdxc_suported_docblocks();
+
+
+
+
+
+
+
         // save all the function tags
         $tags_used = array();
         foreach ($phpdoc->getTags() as $tag) {
 
             foreach ($dock_blocks as $key => $title) {
+                //first clear the data.
+               // delete_post_meta($post_id, 'cdxc_' . $key);
                 if ($tag->getName() == $key) {
 
                     if (isset($tags_used[$key])) {// if there are multiple tags
@@ -1020,6 +1064,21 @@ function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
             }
 
             //echo '###'.$tag->getName().'::'.$tag->getContent();
+        }
+
+        //summary
+        if ($phpdoc->getShortDescription()) {
+
+            // check if it is documented elsewhere
+            if(substr($phpdoc->getShortDescription(), 0, 28) === 'This filter is documented in'){
+                return;
+            }
+            update_post_meta($post_id, 'cdxc_summary', $phpdoc->getShortDescription());
+        }
+
+        //description
+        if ($phpdoc->getLongDescription()->getContents()) {
+            update_post_meta($post_id, 'cdxc_description', $phpdoc->getLongDescription()->getContents());
         }
 
 
@@ -1133,6 +1192,7 @@ function cdxc_suported_docblocks()
         'actions' => __('Actions', CDXC_TEXTDOMAIN),//non standard
         'filters' => __('Filters', CDXC_TEXTDOMAIN),//non standard
         'location' => __('Source File', CDXC_TEXTDOMAIN),//non standard
+        'used_by' => __('Used by', CDXC_TEXTDOMAIN),//non standard
         'code' => __('Source Code', CDXC_TEXTDOMAIN),//non standard
 
 

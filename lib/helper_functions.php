@@ -40,6 +40,8 @@ function cdxc_status_text($type, $el)
 
     echo '<div class="cc-add-update-project-bloc">';
     if ($term) {
+
+       // print_r(get_option("cdxc_plugin_".$el));
         ?>
 
         <h4><?php _e('It looks like this project is already added, select an option below.', CDXC_TEXTDOMAIN); ?></h4>
@@ -235,4 +237,66 @@ function cdxc_get_hook_name($hook){
 
     return $name;
 
+}
+
+function cdxc_build_project_hooks_tree($c_type,$c_name,$file_loc,$func,$hook_type,$hook_name,$hook_line){
+
+
+    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    $project_name = "cdxc_".$c_type."_".$c_name;
+
+
+    if($p_tree = get_option($project_name)){
+
+    }else{
+        $p_tree = array();
+    }
+
+
+    if($hook_type=='action'){
+        $p_tree['actions'][] = array(
+            'hook_name' => $hook_name,
+            'function_name' => $func[0][1],
+            'hook_line' => $hook_line,
+            'file_path' =>  $file_path
+        );
+    }
+    elseif($hook_type=='filter'){
+        $p_tree['filters'][] = array(
+            'hook_name' => $hook_name,
+            'function_name' => $func[0][1],
+            'hook_line' => $hook_line,
+            'file_path' =>  $file_path
+        );
+    }
+
+
+    update_option($project_name,$p_tree);
+}
+
+function cdxc_get_hook_used_by($c_type,$c_name,$hook_type,$hook_name){
+    $used = array();
+    if($p_tree = get_option("cdxc_".$c_type."_".$c_name)){
+        $used = array();
+        if(!empty($p_tree)){
+
+            if($hook_type=='action'){
+                $hooks = $p_tree['actions'];
+            }else{
+                $hooks = $p_tree['filters'];
+            }
+
+            foreach($hooks as $hook){
+                if($hook['hook_name']==$hook_name){
+                    $used[] = $hook;
+                }
+
+            }
+
+            return $used;
+
+        }
+
+    }
+    return $used;
 }

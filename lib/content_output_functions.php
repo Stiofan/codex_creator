@@ -208,9 +208,11 @@ function cdxc_global_content($post_id, $title)
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
     if (is_array($meta_value)) {
         foreach ($meta_value as $value) {
+            $value = cdxc_global_content_helper($value);
             $content .= CDXC_CONTENT_START . $value . CDXC_CONTENT_END;
         }
     } else {
+        $meta_value = cdxc_global_content_helper($meta_value);
         $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
     }
 
@@ -223,6 +225,93 @@ function cdxc_global_content($post_id, $title)
      * @param string $title The title for the content.
      */
     return apply_filters('cdxc_global_content', $content, $post_id, $title);
+}
+
+/**
+ * Arrange a param value into a usable HTML output.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param string $param The param value to be used.
+ * @return string Formatted HTML on success.
+ */
+function cdxc_global_content_helper($param)
+{   if($param==''){return '';}
+    $output = '';
+    $param_arr = explode(' ',$param);
+    $param_arr = array_values(array_filter($param_arr));
+    //print_r($param_arr);
+
+    $output .= '<dl>';
+    //variable
+    if(!empty($param_arr[1])){
+        $var = $param_arr[1];
+        $output .= '<dt><b>'.$var.'</b></dt>';
+        unset($param_arr[1]);
+    }
+
+    $output .= '<dd>';
+    //datatype
+    if(!empty($param_arr[0])){
+        $datatype = $param_arr[0];
+        $link_open = '';
+        $link_close = '';
+        if($datatype=='string' || $datatype=='String'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#String" target="_blank">';
+            $link_close = '</a>';
+        }
+        if($datatype=='int'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#Integer" target="_blank">';
+            $link_close = '</a>';
+        }
+        if($datatype=='bool'){
+            $link_open = '<a href="http://codex.wordpress.org/How_to_Pass_Tag_Parameters#Boolean" target="_blank">';
+            $link_close = '</a>';
+        }
+
+        $output .= '('.$link_open.'<i>'.$datatype.'</i>'.$link_close.') ';
+        unset($param_arr[0]);
+
+    }
+
+
+
+    //optional
+    $optional = '(<i>'.__('required', CDXC_TEXTDOMAIN).'</i>)';
+    if(!empty($param_arr[2])){
+        $opt = $param_arr[2];
+        if($opt=='Optional.' || $opt=='optional.'){
+            $optional = '(<i>'.__('optional', CDXC_TEXTDOMAIN).'</i>)';
+            unset($param_arr[2]);
+        }
+    }
+    $output .= $optional.' ';
+
+    //we now split into descriptions.
+    $param_str = implode(' ',$param_arr);
+    $param_arr = explode('.',$param_str);
+    $param_arr = array_filter($param_arr);
+    //print_r($param_arr);
+
+    //description/default
+    $default = '<dl><dd>'.__('Default', CDXC_TEXTDOMAIN).': <i>'.__('None', CDXC_TEXTDOMAIN).'</i></dd></dl>';
+    foreach ($param_arr as $bit) {
+        $bit = trim($bit);
+        //echo '#'.$bit.'#';
+        if(substr( $bit, 0, 7) === 'Default'){
+            $bits = explode('Default',$bit);
+            $default = '<dl><dd>'.__('Default', CDXC_TEXTDOMAIN).': <i>'.$bits[1].'</i></dd></dl>';
+
+        }else{
+            $output .= $bit.'. ';
+        }
+    }
+
+    $output .= $default;
+
+    $output .= '</dd>';
+    $output .= '</dl>';
+    return $output;
 }
 
 /**
@@ -1102,7 +1191,7 @@ function cdxc_location_content($post_id, $title)
 {
     $content = '';
     $meta_type = get_post_meta($post_id, 'cdxc_meta_type', true);
-    if ($meta_type == 'file') {
+    if ($meta_type == 'file' || $meta_type == 'action' || $meta_type == 'filter') {
         return false;
     }
     $meta_value = get_post_meta($post_id, 'cdxc_meta_path', true);
@@ -1174,4 +1263,56 @@ function cdxc_code_content($post_id, $title)
      * @param string $title The title for the content.
      */
     return apply_filters('cdxc_code_content', $content, $post_id, $title);
+}
+
+/**
+ * Get and format content output for filters section of the codex page.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ * @param int $post_id Post ID of the post content required.
+ * @param string $title Title for the content section.
+ * @return string The formatted content.
+ */
+function cdxc_used_by_content($post_id, $title)
+{
+    $content = '';
+    $meta_value = get_post_meta($post_id, 'cdxc_meta_used_by', true);
+    if (!$meta_value) {
+        return;
+    }
+    $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
+
+    if (is_array($meta_value)) {
+        foreach ($meta_value as $func) {
+
+            $func_arr = get_page_by_title($func['function_name'], OBJECT, 'codex_creator');
+
+            // print_r($func_arr);exit;
+            $name = "".$func['function_name']."()";
+            if (is_object($func_arr)) {
+                $link = get_permalink($func_arr->ID);
+
+                $content .= CDXC_CONTENT_START . $func['file_path'].': <a href="' . $link . '">' .  $name . ' </a> [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func['hook_line'] . ']' . CDXC_CONTENT_END;
+            } else {
+                $content .= CDXC_CONTENT_START .$func['file_path'].': '. $name . ' [' . __('Line', CDXC_TEXTDOMAIN) . ': ' . $func['hook_line'] . ']' . CDXC_CONTENT_END;
+
+            }
+
+        }
+
+
+    }
+
+    //$content .= CDXC_CONTENT_START.print_r($meta_value,true).CDXC_CONTENT_END;
+
+    /**
+     * Filter the content returned by the function.
+     *
+     * @since 1.0.0
+     * @param string $content The content to be output.
+     * @param int $post_id The post ID.
+     * @param string $title The title for the content.
+     */
+    return apply_filters('cdxc_used_by_content', $content, $post_id, $title);
 }
