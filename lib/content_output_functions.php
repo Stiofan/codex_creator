@@ -390,8 +390,11 @@ function cdxc_link_content($post_id, $title)
     if (!$meta_value) {
         return;
     }
+    /*
+     * @todo add checking for parsing links
+     */
     $content .= CDXC_TITLE_START . $title . CDXC_TITLE_END;
-    $content .= CDXC_CONTENT_START . $meta_value . CDXC_CONTENT_END;
+    $content .= CDXC_CONTENT_START ."<a href='$meta_value' >".$meta_value . "</a>".CDXC_CONTENT_END;
 
     /**
      * Filter the content returned by the function.
@@ -1289,7 +1292,10 @@ function cdxc_used_by_content($post_id, $title)
             $func_arr = get_page_by_title($func['function_name'], OBJECT, 'codex_creator');
 
             // print_r($func_arr);exit;
-            $name = "".$func['function_name']."()";
+            $name = '';
+            if($func['function_name']){
+                $name = "".$func['function_name']."()";
+            }
             if (is_object($func_arr)) {
                 $link = get_permalink($func_arr->ID);
 

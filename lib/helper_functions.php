@@ -252,11 +252,16 @@ function cdxc_build_project_hooks_tree($c_type,$c_name,$file_loc,$func,$hook_typ
         $p_tree = array();
     }
 
+    $func_name = '';
+    if(isset($func[0][1])){
+        $func_name = $func[0][1];
+    }
+
 
     if($hook_type=='action'){
         $p_tree['actions'][] = array(
             'hook_name' => $hook_name,
-            'function_name' => $func[0][1],
+            'function_name' => $func_name,
             'hook_line' => $hook_line,
             'file_path' =>  $file_path
         );
@@ -264,7 +269,7 @@ function cdxc_build_project_hooks_tree($c_type,$c_name,$file_loc,$func,$hook_typ
     elseif($hook_type=='filter'){
         $p_tree['filters'][] = array(
             'hook_name' => $hook_name,
-            'function_name' => $func[0][1],
+            'function_name' => $func_name,
             'hook_line' => $hook_line,
             'file_path' =>  $file_path
         );
