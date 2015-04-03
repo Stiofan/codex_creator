@@ -40,8 +40,12 @@ function cdxc_status_text($type, $el)
 
     echo '<div class="cc-add-update-project-bloc">';
     if ($term) {
-
-       // print_r(get_option("cdxc_plugin_".$el));
+        /**
+         * Called before the project exists ajax message.
+         *
+         * @since 1.0.0
+         */
+       do_action('cdxc_before_project_exists_msg');
         ?>
 
         <h4><?php _e('It looks like this project is already added, select an option below.', CDXC_TEXTDOMAIN); ?></h4>
@@ -53,7 +57,17 @@ function cdxc_status_text($type, $el)
 
     <?php
 
-    } else { ?>
+    } else {
+
+        /**
+         * Called before the add project ajax message.
+         *
+         * @since 1.0.0
+         */
+        do_action('cdxc_before_project_add_msg');
+        ?>
+
+
 
         <h4><?php _e('It looks like this is a new project, please click below to add it.', CDXC_TEXTDOMAIN); ?></h4>
         <span onclick="cdxc_add_project('<?php echo $type; ?>','<?php echo $el; ?>');"

@@ -580,6 +580,11 @@ function cdxc_find_function_hooks($file,$c_name,$c_type,$part,$file_arr,$parent_
             $hooks_arr[] = cdxc_proccess_action($file,$c_name,$c_type,$func_part,$file_arr,'filter',$func);
 
         }
+        elseif($func_part->getType()=='Stmt_Return' && isset($func_part->expr->name->parts[0]) && $func_part->expr->name->parts[0]=='apply_filters'){// check for apply filters being echoed
+
+            $hooks_arr[] = cdxc_proccess_action($file,$c_name,$c_type,$func_part,$file_arr,'filter',$func);
+
+        }
         elseif($func_part->getType()=='Stmt_Echo' && isset($func_part->exprs[0]->name->parts[0]) && $func_part->exprs[0]->name->parts[0]=='apply_filters' ){// check for apply filters being echoed
 
             $hooks_arr[] = cdxc_proccess_action($file,$c_name,$c_type,$func_part,$file_arr,'filter',$func);
@@ -678,7 +683,11 @@ function cdxc_proccess_action($file,$c_name,$c_type,$func_part,$file_arr,$type,$
     $hooks[2] = $func_part->getLine();
     $hooks[3] = $type;
     $cdxc_actions_arr[]=$hooks;
-    cdxc_sync_action($file,$hooks,$c_name,$func,$c_type,$code);
+    if($type=='action') {
+        cdxc_sync_action($file, $hooks, $c_name, $func, $c_type, $code);
+    }else {
+        cdxc_sync_filter($file, $hooks, $c_name, $func, $c_type, $code);
+    }
     return $hooks;
 
 
