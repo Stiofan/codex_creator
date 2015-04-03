@@ -781,6 +781,27 @@ function cdxc_see_content_helper($text)
     if ($text == '') {
         return '';
     }
+
+    if (strpos($text,'"') !== false || strpos($text,"'") !== false) {// we have a hook
+
+        $new_text = str_replace(array('"',"'"),'',$text);
+        $page = get_page_by_title($new_text, OBJECT, 'codex_creator');
+        if($page) {
+            $link = get_permalink($page->ID);
+            $text = "<a href='$link' >$text</a>";
+        }
+
+    }elseif(strpos($text,'()') !== false){
+
+        $new_text = str_replace('()','',$text);
+        $page = get_page_by_title($new_text, OBJECT, 'codex_creator');
+        if($page) {
+            $link = get_permalink($page->ID);
+            $text = "<a href='$link' >$text</a>";
+        }
+
+    }
+
     return $text;
 }
 
