@@ -495,6 +495,9 @@ function cdxc_parse_file($file,$c_name,$c_type)
     else{
         $file_arr = cdxc_get_file_array($file);
 
+       // print_r($stmts);
+       // print_r($file_arr);
+
         foreach($stmts as $part){
             /*
              * If a main function.

@@ -26,6 +26,7 @@ function register_my_custom_submenu_page()
  */
 function cdxc_main_page()
 {
+    //cdxc_scan_project('plugin','PayFast Payment GeoDirectory Add-on');
     ?>
     <div class="wrap">
         <div id="icon-tools" class="icon32"></div>
@@ -47,7 +48,31 @@ function cdxc_main_page()
                           onclick="cdxc_step_1('plugin');"><?php _e('Plugin', CDXC_TEXTDOMAIN); ?></span>
                     <span class="step-1-theme button button-primary"
                           onclick="cdxc_step_1('theme');"><?php _e('Theme', CDXC_TEXTDOMAIN); ?></span>
+                    <span class="step-1-theme button button-primary"
+                          onclick="cdxc_step_1('github');"><?php _e('GitHub', CDXC_TEXTDOMAIN); ?></span>
+                    <span class="step-1-theme button button-primary"
+                          onclick="cdxc_step_1('bitbucket');"><?php _e('Bitbucket', CDXC_TEXTDOMAIN);?></span>
+
                 </div>
+                <div id="cdxc-step1-info"><?php
+                    if(isset($_REQUEST['code']) && $_REQUEST['code']){
+
+                        $bitbucket = get_option('cdxc_bitbucket');
+                        if(isset($bitbucket['secret']) && $bitbucket['secret'] && isset($bitbucket['key']) && $bitbucket['key']){
+                            $bitbucket['code'] = esc_attr($_REQUEST['code']);
+                            update_option('cdxc_bitbucket',$bitbucket);
+                            //authorised so lets run the next step
+                           ?>
+                            <script>
+                                jQuery(function() {
+                                    cdxc_step_1('bitbucket');
+                                });
+                            </script>
+                            <?php
+                        }
+
+                    }
+                    ?></div>
             </div>
 
             <div class="codex-creator-step-2 cc-step">

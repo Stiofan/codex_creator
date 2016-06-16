@@ -17,10 +17,12 @@ function cdxc_step_1(cType) {
 
     if (cType == 'theme') {
         alert('coming soon');
-    } else if (cType == 'plugin') {
+    } else if (cType == 'plugin' || cType == 'github') {
         jQuery('#cdxc_type_val').val(cType);
-        cdxc_get_step_2('plugin');
+        cdxc_get_step_2(cType);
         cdxc_set_active_step(2);
+    }else if(cType == 'bitbucket'){
+        cdxc_bitbucket_maybe_auth();
     }
 
 }
@@ -64,10 +66,11 @@ function cdxc_get_step_2(cType) {
 
 function cdxc_step_3($type, $plugin, $name) {
     // alert($name);
-    jQuery('#cdxc_project_name_val').val($name);
-    jQuery('#cdxc_project_root_val').val($plugin);
-    cdxc_scan_files($type, $plugin, $name)
-    cdxc_set_active_step(3);
+        jQuery('#cdxc_project_name_val').val($name);
+        jQuery('#cdxc_project_root_val').val($plugin);
+        cdxc_scan_files($type, $plugin, $name);
+        cdxc_set_active_step(3);
+
 }
 
 
@@ -294,4 +297,204 @@ function cdxc_scroll_to($el) {
 }
 
 
+function cdxc_get_github_repo(){
 
+    $githubUrl = jQuery('#cdxc_github_url').val();
+
+    if(!$githubUrl){return;} //sanity check
+
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_get_git_repo_ajax',
+            'c_url': $githubUrl,
+        },
+        success: function (data) {
+            if (data) {
+
+                var obj = jQuery.parseJSON(data);
+                console.log(obj);
+                if(obj.error){
+                    alert(obj.error);
+                }else{
+                    cdxc_step_3('github',obj.name,obj.name);
+                }
+               // cdxc_create_loading_bar_content(data);
+                //cdxc_create_codex_content($type, $el, data);
+               //
+            }
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+
+
+}
+
+
+function cdxc_toggle_project_cron($type, $name) {
+    // This does the ajax request
+
+    $set = jQuery('span[data-cc-cron-name="'+$name+'"]').data("cron-set");
+
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_toggle_project_cron',
+            'c_type': $type,
+            'c_name':  $name,
+            'c_set':  $set
+        },
+        success: function (data) {
+            console.log(data);
+            if (data) {
+                if(data==1){
+                    jQuery('span[data-cc-cron-name="'+$name+'"] i').removeClass( 'fa-square-o' );
+                    jQuery('span[data-cc-cron-name="'+$name+'"] i').addClass( 'fa-check-square-o' );
+                    jQuery('span[data-cc-cron-name="'+$name+'"]').data("cron-set",1);
+                }
+                if(data==2){
+                    jQuery('span[data-cc-cron-name="'+$name+'"] i').removeClass( 'fa-check-square-o' );
+                    jQuery('span[data-cc-cron-name="'+$name+'"] i').addClass( 'fa-square-o' );
+                    jQuery('span[data-cc-cron-name="'+$name+'"]').data("cron-set",0);
+                }
+            }
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+
+}
+
+function cdxc_show_git_sync_info($type, $name) {
+    // This does the ajax request
+
+
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_show_git_sync_info',
+            'c_type': $type,
+            'c_name':  $name
+        },
+        success: function (data) {
+            console.log(data);
+            if (data) {
+                jQuery('#cdxc-ajax-info').html(data);
+            }
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+
+}
+
+function cdxc_bitbucket_maybe_auth(){
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_bitbucket_maybe_auth_ajax'
+        },
+        success: function (data) {
+            console.log(data);
+            if (data=='1') {
+                jQuery('#cdxc_type_val').val('bitbucket');
+                cdxc_get_step_2('bitbucket');
+                cdxc_set_active_step(2);
+                console.log('x1');
+            }else{
+                // we need to get auth
+                cdxc_bitbucket_get_auth();console.log('x2');
+            }
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
+function cdxc_bitbucket_get_auth(){
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_bitbucket_get_auth_ajax'
+        },
+        success: function (data) {
+            console.log(data);console.log('x3');
+            if (data) {
+                jQuery('#cdxc-step1-info').html(data);
+            }
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
+function cdxc_bitbucket_do_auth(){
+    
+    $key = jQuery('#cdxc-bitbucket-key').val();
+    if(!$key){alert('please enter key');return;}
+
+    $secret = jQuery('#cdxc-bitbucket-secret').val();
+    if(!$key){alert('please enter secret');return;}
+
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_bitbucket_do_auth_ajax',
+            'c_key': $key,
+            'c_secret': $secret
+        },
+        success: function (data) {
+            console.log(data);console.log('x4');
+            if (data=='1') {
+                window.location.replace("https://bitbucket.org/site/oauth2/authorize?client_id="+$key+"&response_type=code");
+            }
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
+function cdxc_get_bitbucket_repo($bitname,$biturl){
+
+    if(!$bitname){$bitname = jQuery('#cdxc-bitbucket-repos').val();}
+    if(!$biturl){$biturl = jQuery('#cdxc-bitbucket-repos option:selected').attr('data-biturl');}
+
+    if(!$biturl){return;} //sanity check
+
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_get_bit_repo_ajax',
+            'c_url': $biturl,
+            'c_name': $bitname
+        },
+        success: function (data) {
+            console.log(data);
+            if (data) {
+
+                var obj = jQuery.parseJSON(data);
+                console.log(obj);
+                if(obj.error){
+                    alert(obj.error);
+                }else{
+                    cdxc_step_3('bitbucket',obj.path,obj.name);
+                }
+                // cdxc_create_loading_bar_content(data);
+                //cdxc_create_codex_content($type, $el, data);
+                //
+            }
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+
+
+}

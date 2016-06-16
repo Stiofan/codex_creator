@@ -131,3 +131,13 @@ include_once('lib/file_functions.php');
  * Codex Creator file functions.
  */
 include_once('lib/add_meta_boxes.php');
+
+/**
+ * Codex Creator cron functions.
+ */
+include_once('lib/cron_functions.php');
+
+/**
+ * Codex Creator Bitbucket functions.
+ */
+include_once('lib/bitbucket_functions.php');

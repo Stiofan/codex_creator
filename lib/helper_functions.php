@@ -50,10 +50,36 @@ function cdxc_status_text($type, $el)
 
         <h4><?php _e('It looks like this project is already added, select an option below.', CDXC_TEXTDOMAIN); ?></h4>
         <span onclick="cdxc_sync_project_files('<?php echo $type; ?>','<?php echo $el; ?>');"
-              class="cc-add-project-btn button button-primary"><?php _e('Sync all files', CDXC_TEXTDOMAIN); ?></span>
+              class="cc-add-project-btn button button-primary"><?php _e('Sync all files now', CDXC_TEXTDOMAIN); ?></span>
 
-        <?php // @todo add tools such as add link to docblock to codex page, create basic docblocks for pages/functions ?>
-        <h4><?php _e('Other tools to be added soon.', CDXC_TEXTDOMAIN); ?></h4>
+
+        <?php
+
+        $crons = cdxc_get_cron_projects();
+        if(isset($crons[$el])){
+            $cron_set = '1';
+            $cron_class = 'fa-check-square-o';
+        }else{
+            $cron_set = '0';
+            $cron_class = 'fa-square-o';
+        }
+        ?>
+        <span onclick="cdxc_toggle_project_cron('<?php echo $type; ?>','<?php echo $el; ?>');" data-cron-set="<?php echo $cron_set;?>" data-cc-cron-name="<?php echo $el;?>"
+              class="cc-add-project-btn button button-primary "><i class="fa <?php echo $cron_class;?>" ></i> <?php _e('Sync once per day via cron', CDXC_TEXTDOMAIN); ?></span>
+
+        <?php
+        // if github then allow to set via a webhook
+        if($type=='github'){
+        ?>
+        <span onclick="cdxc_show_git_sync_info('<?php echo $type; ?>','<?php echo $el; ?>');"
+              class="cc-add-project-btn button button-primary"><?php _e('Sync via GitHub webhook', CDXC_TEXTDOMAIN); ?></span>
+        <?php }elseif($type=='bitbucket'){
+        ?>
+        <span onclick="cdxc_show_git_sync_info('<?php echo $type; ?>','<?php echo $el; ?>');"
+              class="cc-add-project-btn button button-primary"><?php _e('Sync via Bitbucket webhook', CDXC_TEXTDOMAIN); ?></span>
+    <?php }?>
+        
+        <div id="cdxc-ajax-info"></div>
 
     <?php
 
@@ -318,4 +344,60 @@ function cdxc_get_hook_used_by($c_type,$c_name,$hook_type,$hook_name){
 
     }
     return $used;
+}
+
+
+function cdxc_get_githubs(){
+    return get_option('cdxc_github_repos');
+}
+
+function cdxc_set_github($git){
+
+    if(empty($git)){return false;}
+    $githubs = get_option('cdxc_github_repos');
+
+    $githubs[$git->name] = array(
+        'Name'  => $git->name,
+        'url'   => $git->html_url
+        );
+
+    update_option('cdxc_github_repos',$githubs);
+
+    return true;
+}
+
+function cdxc_parse_github_url($url){
+    if(empty($url)){return false;}
+
+    if(filter_var($url, FILTER_VALIDATE_URL) && substr( $url, 0, 18 ) === "https://github.com")
+    {
+        $parts = parse_url ($url);
+        if(isset($parts['path'])){
+            return $parts['path'];
+        }
+    }
+
+    return false;
+
+}
+
+function cdxc_get_github_info($path){
+
+    $response = wp_remote_get( 'https://api.github.com/repos'.$path );
+    if( is_array($response) && isset($response['response']['code']) && $response['response']['code']=='200') {
+        return json_decode($response['body']); // use the content
+    }
+
+    return false;
+    
+}
+
+function cdxc_generate_key($length = 20) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
 }

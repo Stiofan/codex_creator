@@ -1,0 +1,7 @@
+1.1.0
+GitHub support added, both get and webhook run - ADDED
+Bitbucket support added, both get and webhook run - ADDED
+Cron job settings added per project (final function needs implemented) - ADDED
+
+1.0.0
+Initial release

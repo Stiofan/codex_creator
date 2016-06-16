@@ -32,8 +32,49 @@ function cdxc_get_type_list()
         }
         echo "<ul>";
 
-    } else {
+    } elseif(isset($_REQUEST['c_type']) && $_REQUEST['c_type'] == 'github') {
 
+        $githubs = cdxc_get_githubs();
+        
+        echo "<ul>";
+
+        echo "<li><input id='cdxc_github_url' type='text' placeholder='".__('Enter GitHub URL', CDXC_TEXTDOMAIN) ."'><span class=\"step-2-github button button-primary\" onclick=\"cdxc_get_github_repo();\">".__('GO', CDXC_TEXTDOMAIN) ."</span></li>";
+
+        if(is_array( $githubs )){
+            foreach ($githubs as $name => $github) {
+
+                $project = '';
+                if (cdxc_has_codex($github['Name'])) {
+                    $project = '<i class="fa fa-book" title="' . __('Project exists', CDXC_TEXTDOMAIN) . '"></i> ';
+                }
+
+                echo "<li data-git='" . $name . "' onclick=\"cdxc_step_3('github','$name','" . $github['Name'] . "');\" class=\"cc-plugin-theme-list button button-primary\">" . $project . $github['Name'] . "</li>";
+            }
+        }
+
+        echo "<ul>";
+    }elseif(isset($_REQUEST['c_type']) && $_REQUEST['c_type'] == 'bitbucket') {
+
+        $githubs = cdxc_get_bitbuckets();
+        $githubs_select = cdxc_get_bitbuckets_select();
+
+        echo "<ul>";
+
+        echo "<li>$githubs_select<span class=\"step-2-github button button-primary\" onclick=\"cdxc_get_bitbucket_repo();\">".__('GO', CDXC_TEXTDOMAIN) ."</span></li>";
+
+        if(is_array( $githubs )){
+            foreach ($githubs as $name => $github) {
+
+                $project = '';
+                if (cdxc_has_codex($github['Name'])) {
+                    $project = '<i class="fa fa-book" title="' . __('Project exists', CDXC_TEXTDOMAIN) . '"></i> ';
+                }
+
+                echo "<li data-git='" . $name . "' onclick=\"cdxc_get_bitbucket_repo('" . $github['Name'] . "','" . $github['url'] . "');\" class=\"cc-plugin-theme-list button button-primary\">" . $project . $github['Name'] . "</li>";
+            }
+        }
+
+        echo "<ul>";
     }
 
     die();
@@ -59,16 +100,35 @@ function cdxc_scan()
         exit;
     }
 
-
     if (isset($_REQUEST['c_path']) && $_REQUEST['c_path']) {
-        // is in directory
-        if ($pieces = explode("/", $_REQUEST['c_path'])) {
-            $path = $wp_filesystem->wp_plugins_dir() . $pieces[0];
-        } else {
-            // single file
-            $path = $wp_filesystem->wp_plugins_dir() . $_REQUEST['c_path'];
+
+        if(isset($_REQUEST['c_type']) && $_REQUEST['c_type']=='plugin'){
+            // is in directory
+            if ($pieces = explode("/", $_REQUEST['c_path'])) {
+                $path = $wp_filesystem->wp_plugins_dir() . $pieces[0];
+            } else {
+                // single file
+                $path = $wp_filesystem->wp_plugins_dir() . $_REQUEST['c_path'];
+            }
+        }elseif(isset($_REQUEST['c_type']) && $_REQUEST['c_type']=='github'){
+            $destination = wp_upload_dir();
+            $destination_path = $destination['basedir']. '/cdxc_temp/';
+
+            $path = $destination_path.$_REQUEST['c_path'].'-master';
+
+
+        }elseif(isset($_REQUEST['c_type']) && $_REQUEST['c_type']=='bitbucket'){
+
+            $destination = wp_upload_dir();
+            $destination_path = $destination['basedir']. '/cdxc_temp/';
+
+            $c_path = str_replace('https://bitbucket.org/','',$_REQUEST['c_path']);
+
+            $path = $destination_path.$c_path;
+
 
         }
+
 
         // Check the status and display the apropriate actions
         cdxc_status_text($_REQUEST['c_type'], $_REQUEST['c_name']);
@@ -145,7 +205,7 @@ function cdxc_scan_output($files, $path, $folder = '')
             $code_content = '';
             $code_content .= cdxc_get_file_functions($file_path);// get all the functions in the file.
             $code_content .= cdxc_get_file_actions($file_path); //get all the actions in a file.
-            $code_content .= cdxc_get_file_filters($file_path); //get all the actions in a file.
+            $code_content .= cdxc_get_file_filters($file_path); //get all the filters in a file.
 
             if($code_content){
                 echo '<ul class="cc-code-bits-tree">';
@@ -243,27 +303,33 @@ function cdxc_filesystem_notice()
  * @since 1.0.0
  * @package Codex_Creator
  */
-function cdxc_add_project()
+function cdxc_add_project($type='',$name='')
 {
+    $mute = false;
+    if(!$type){$type = esc_attr($_REQUEST['c_type']);}else{$mute = true;}
+    if(!$name){$name = esc_attr($_REQUEST['c_name']);}
 
-    if (!isset($_REQUEST['c_name'])) {
+    if (!isset($name)) {
         _e('There was a problem adding this project.', CDXC_TEXTDOMAIN);
         die();
     }
-    $project = array('cat_name' => $_REQUEST['c_name'], 'category_description' => '', 'taxonomy' => 'codex_project');
+    $project = array('cat_name' => $name, 'category_description' => '', 'taxonomy' => 'codex_project');
     $result = wp_insert_category($project);
+
 
     if ($result) {
         if (is_wp_error($result)) {
             $error_string = $result->get_error_message();
             echo '<div id="message" class="error"><p>' . $error_string . '</p></div>';
         } else {
-            cdxc_status_text($_REQUEST['c_type'], $_REQUEST['c_name']);
+            if($mute){return;}
+            cdxc_status_text($type , $name);
         }
 
     } else {
         _e('There was a problem adding this project.', CDXC_TEXTDOMAIN);
     }
+    if($mute){return;}
     die();
 }
 
@@ -276,14 +342,14 @@ add_action('wp_ajax_cdxc_add_project', 'cdxc_add_project');
  * @since 1.0.0
  * @package Codex_Creator
  */
-function cdxc_sync_file()
+function cdxc_sync_file($c_type='',$c_name='',$file_loc='',$first_run='')
 {
 
-
-    $c_type = $_REQUEST['c_type'];// for future we will also do it for themes
-    $c_name = $_REQUEST['c_name'];
-    $file_loc = $_REQUEST['file_loc'];
-    $first_run = $_REQUEST['first_file'];
+    $mute = false;
+    if(!$c_type && isset($_REQUEST['c_type'])){$c_type = $_REQUEST['c_type'];}else{$mute = true;}// for future we will also do it for themes
+    if(!$c_name && isset($_REQUEST['c_name'])){$c_name = $_REQUEST['c_name'];}
+    if(!$file_loc && isset($_REQUEST['file_loc'])){$file_loc = $_REQUEST['file_loc'];}
+    if(!$first_run && isset($_REQUEST['first_file'])){$first_run = $_REQUEST['first_file'];}
 
     if($first_run){
         update_option("cdxc_".$c_type."_".$c_name,array());
@@ -291,12 +357,24 @@ function cdxc_sync_file()
 
 
     // check file is in plugin dir
-    if (strpos($file_loc, WP_PLUGIN_DIR) === false) {
+
+    $destination = wp_upload_dir();
+    $upload_dir = $destination['basedir'];
+    if ($c_type=='plugin' && strpos($file_loc, WP_PLUGIN_DIR) === false) {
         echo '0';
         exit;
+    }elseif($c_type=='plugin'){
+        $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
     }
 
-    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    if($c_type=='github' && strpos($file_loc, $upload_dir) === false){
+        echo '0';
+        exit;
+    }elseif($c_type=='github'){
+        $file_path = str_replace($upload_dir . '/cdxc_temp/'.$c_name.'/', "", $file_loc);
+    }
+
+
     $file = basename($file_loc);
 
     $phpdoc = false;
@@ -374,6 +452,7 @@ function cdxc_sync_file()
 
 
     $els = cdxc_parse_file($file_loc,$c_name,$c_type);
+   // echo '###';print_r( $els);
 
     $func_arr = $els[0];
     if (!empty($func_arr)) {
@@ -467,7 +546,7 @@ function cdxc_sync_file()
         update_post_meta($post_id, 'cdxc_summary', __('This file has not been documented yet.', CDXC_TEXTDOMAIN));
     }
 
-
+    if($mute){return;}
     die();
 }
 
@@ -488,13 +567,29 @@ add_action('wp_ajax_cdxc_sync_file', 'cdxc_sync_file');
  */
 function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
 {
-    // check file is in plugin dir
-    if (strpos($file_loc, WP_PLUGIN_DIR) === false || !is_array($func)) {
+
+    if(!is_array($func)){
         echo '0';
         exit;
     }
 
-    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    // check file is in plugin dir
+    $destination = wp_upload_dir();
+    $upload_dir = $destination['basedir'];
+    if ($c_type=='plugin' && strpos($file_loc, WP_PLUGIN_DIR) === false) {
+        echo '0';
+        exit;
+    }elseif($c_type=='plugin'){
+        $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    }
+
+    if($c_type=='github' && strpos($file_loc, $upload_dir) === false){
+        echo '0';
+        exit;
+    }elseif($c_type=='github'){
+        $file_path = str_replace($upload_dir . '/cdxc_temp/'.$c_name.'/', "", $file_loc);
+    }
+
     $file = basename($file_loc);
 
     $docblock = $func[0];
@@ -681,13 +776,27 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
  */
 function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
 {
-    // check file is in plugin dir
-    if (strpos($file_loc, WP_PLUGIN_DIR) === false || !is_array($hooks) || !is_array($func)) {
+    if(!is_array($func)){
         echo '0';
         exit;
     }
 
-    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    // check file is in plugin dir
+    $destination = wp_upload_dir();
+    $upload_dir = $destination['basedir'];
+    if ($c_type=='plugin' && strpos($file_loc, WP_PLUGIN_DIR) === false) {
+        echo '0';
+        exit;
+    }elseif($c_type=='plugin'){
+        $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    }
+
+    if($c_type=='github' && strpos($file_loc, $upload_dir) === false){
+        echo '0';
+        exit;
+    }elseif($c_type=='github'){
+        $file_path = str_replace($upload_dir . '/cdxc_temp/'.$c_name.'/', "", $file_loc);
+    }
     $file = basename($file_loc);
 
     $docblock = $hooks[0];
@@ -874,13 +983,27 @@ function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
  */
 function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
 {
-    // check file is in plugin dir
-    if (strpos($file_loc, WP_PLUGIN_DIR) === false || !is_array($hooks) || !is_array($func)) {
+    if(!is_array($func)){
         echo '0';
         exit;
     }
 
-    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    // check file is in plugin dir
+    $destination = wp_upload_dir();
+    $upload_dir = $destination['basedir'];
+    if ($c_type=='plugin' && strpos($file_loc, WP_PLUGIN_DIR) === false) {
+        echo '0';
+        exit;
+    }elseif($c_type=='plugin'){
+        $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    }
+
+    if($c_type=='github' && strpos($file_loc, $upload_dir) === false){
+        echo '0';
+        exit;
+    }elseif($c_type=='github'){
+        $file_path = str_replace($upload_dir . '/cdxc_temp/'.$c_name.'/', "", $file_loc);
+    }
     $file = basename($file_loc);
 
     $docblock = $hooks[0];
@@ -1190,3 +1313,92 @@ function cdxc_add_title_ref( $title, $id = null ) {
     return $title;
 }
 add_filter( 'the_title', 'cdxc_add_title_ref', 10, 2 );
+
+
+/**
+ * Ajax function to get a github repo.
+ *
+ * @since 1.0.1
+ * @package Codex_Creator
+ */
+function cdxc_get_git_repo_ajax($c_url='',$cron='')
+{
+    global $wpdb,$wp_filesystem;
+    $wp_filesystem = cdxc_init_filesystem();
+    if (!$wp_filesystem) {
+        _e('Codex Creator can not access the filesystem.', CDXC_TEXTDOMAIN);
+        exit;
+    }
+
+    if(!$c_url){$c_url = $_REQUEST['c_url'];}
+
+    $error = '';
+    $info = array();
+    $github_path = cdxc_parse_github_url($c_url);
+    $github = cdxc_get_github_info($github_path);
+    if(!$cron){cdxc_set_github($github);}// add the repo for easier usage next time
+    if(!$github){
+        $error = __('GitHub URL not valid.', CDXC_TEXTDOMAIN);
+    }else{
+        $github_url = trailingslashit($github->html_url)."archive/master.zip";
+        $zip_file = download_url($github_url);
+
+        if (is_wp_error($zip_file)) {
+            $error = $zip_file->get_error_message();
+        }else{
+            $destination = wp_upload_dir();
+            $destination_path = $destination['basedir']. '/cdxc_temp/';
+
+            //lets delete the folder first for housekeeping
+            $wp_filesystem->rmdir($destination_path,true);
+
+            /* Now we can use $plugin_path in all our Filesystem API method calls */
+            if(!$wp_filesystem->is_dir($destination_path)) //@todo set chmod for non execute
+            {
+                /* directory didn't exist, so let's create it */
+                $wp_filesystem->mkdir($destination_path);
+            }
+
+            $zip_path  = $destination_path.$github->name.".zip";
+            $project_path  = $destination_path.$github->name."-master";
+            $move_file = $wp_filesystem->move( $zip_file, $zip_path );
+            if(!$move_file){
+                $error = __('Failed to move file', CDXC_TEXTDOMAIN);
+                unlink($zip_file);
+            }else{
+                $unzip = unzip_file( $zip_path , $destination_path);
+                if(!$unzip ){
+                    $error = __('Failed to unzip on server', CDXC_TEXTDOMAIN);
+                    unlink($zip_path);//delete zip
+                }else{
+                    $info['name'] = $github->name;
+                    $info['full_name'] = $github->full_name;
+                    $info['path'] = $project_path;
+                    unlink($zip_file);
+                }
+
+
+            }
+
+        }
+
+
+
+    }
+
+    if(!$error && $cron){
+        return $info;
+    }
+
+    if($error){
+        echo json_encode(array('error'=>$error));
+    }else{
+        echo json_encode($info );
+    }
+
+    //unlink($zip_file);
+    die();
+}
+
+add_action('wp_ajax_cdxc_get_git_repo_ajax', 'cdxc_get_git_repo_ajax');
+
