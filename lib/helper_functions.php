@@ -19,9 +19,25 @@ function cdxc_has_codex($el)
     $term = term_exists($el, 'codex_project');
     if ($term !== 0 && $term !== null) {
         return true;
-    } else {
-        return false;
     }
+
+    $githubs = get_option('cdxc_github_repos');
+    if(isset($githubs[$el]) && isset($githubs[$el]['codex_project'])){
+        $term = term_exists($githubs[$el]['codex_project'], 'codex_project');
+        if ($term !== 0 && $term !== null) {
+            return true;
+        }
+    }
+    $bitbucket = get_option('cdxc_bitbucket_repos');
+    if(isset( $bitbucket[$el]) && isset( $bitbucket[$el]['codex_project'])){
+        $term = term_exists($bitbucket[$el]['codex_project'], 'codex_project');
+        if ($term !== 0 && $term !== null) {
+            return true;
+        }
+    }
+
+
+    return false;
 }
 
 /**
@@ -46,10 +62,21 @@ function cdxc_status_text($type, $el)
          * @since 1.0.0
          */
        do_action('cdxc_before_project_exists_msg');
+
+
+        $bitbucket = get_option('cdxc_bitbucket_repos');
+        $githubs = get_option('cdxc_github_repos');
+
+        $el_name = $el;
+        if(isset($bitbucket[$el]) && isset($bitbucket[$el]['codex_project'])){
+            $el_name  = $bitbucket[$el]['codex_project'];
+        }elseif(isset($githubs[$el]) && isset($githubs[$el]['codex_project'])){
+            $el_name  = $githubs[$el]['codex_project'];
+        }
         ?>
 
         <h4><?php _e('It looks like this project is already added, select an option below.', CDXC_TEXTDOMAIN); ?></h4>
-        <span onclick="cdxc_sync_project_files('<?php echo $type; ?>','<?php echo $el; ?>');"
+        <span onclick="cdxc_sync_project_files('<?php echo $type; ?>','<?php echo $el_name ; ?>');"
               class="cc-add-project-btn button button-primary"><?php _e('Sync all files now', CDXC_TEXTDOMAIN); ?></span>
 
 
@@ -97,7 +124,14 @@ function cdxc_status_text($type, $el)
 
         <h4><?php _e('It looks like this is a new project, please click below to add it.', CDXC_TEXTDOMAIN); ?></h4>
         <span onclick="cdxc_add_project('<?php echo $type; ?>','<?php echo $el; ?>');"
-              class="cc-add-project-btn button button-primary"><?php _e('Add new project', CDXC_TEXTDOMAIN); ?></span>
+              class="cc-add-project-btn button button-primary"><?php _e('Add new project (recommended)', CDXC_TEXTDOMAIN); ?></span>
+
+        <?php
+        if($type=='github' || $type=='bitbucket' ){
+        ?>
+        <span onclick="cdxc_add_to_existing_project('<?php echo $type; ?>','<?php echo $el; ?>');"
+              class="cc-add-project-btn button button-primary"><?php _e('Link to existing project (not recommended)', CDXC_TEXTDOMAIN); ?></span>
+        <?php }?>
 
     <?php
     }
@@ -172,6 +206,10 @@ function cdxc_post_exits($title, $cat,$type)
     global $wpdb;
 
     $project_slug = $wpdb->get_var($wpdb->prepare("SELECT slug FROM $wpdb->terms WHERE name=%s", $cat));
+    if (!$project_slug) {
+        $project_slug = $wpdb->get_var($wpdb->prepare("SELECT slug FROM $wpdb->terms WHERE slug=%s", $cat));
+    }
+
     if (!$project_slug) {
         return false;
     }
@@ -282,7 +320,26 @@ function cdxc_get_hook_name($hook){
 function cdxc_build_project_hooks_tree($c_type,$c_name,$file_loc,$func,$hook_type,$hook_name,$hook_line){
 
 
-    $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    if($c_type=='github'){
+        $uploads = wp_upload_dir();
+
+        $file_path = str_replace( $uploads['basedir']. '/cdxc_temp/', "", $file_loc);
+        if(($pos = strpos($file_path, '/')) !== false)
+        {
+            $file_path = substr($file_path, $pos + 1);
+        }
+    }elseif($c_type=='bitbucket'){
+        $uploads = wp_upload_dir();
+
+        $file_path = str_replace( $uploads['basedir']. '/cdxc_temp/', "", $file_loc);
+        if(($pos = strpos($file_path, '/')) !== false)
+        {
+            $file_path = substr($file_path, $pos + 1);
+        }
+    }else{
+        $file_path = str_replace(WP_PLUGIN_DIR . '/', "", $file_loc);
+    }
+
     $project_name = "cdxc_".$c_type."_".$c_name;
 
 
@@ -356,10 +413,8 @@ function cdxc_set_github($git){
     if(empty($git)){return false;}
     $githubs = get_option('cdxc_github_repos');
 
-    $githubs[$git->name] = array(
-        'Name'  => $git->name,
-        'url'   => $git->html_url
-        );
+    $githubs[$git->name]['Name']=$git->name;
+    $githubs[$git->name]['url']=$git->html_url;
 
     update_option('cdxc_github_repos',$githubs);
 
@@ -400,4 +455,56 @@ function cdxc_generate_key($length = 20) {
         $randomString .= $characters[rand(0, $charactersLength - 1)];
     }
     return $randomString;
+}
+
+function cdxc_get_project_by_name($name,$type='') {
+
+    if($type=='github' || $type==''){
+        $githubs = get_option('cdxc_github_repos');
+       // print_r($githubs);
+        if(isset($githubs[$name]['codex_project'])){
+            return $githubs[$name]['codex_project'];
+        }
+    }
+
+    if($type=='bitbucket' || $type==''){
+        $bitbucket = get_option('cdxc_bitbucket_repos');
+        //print_r($bitbucket);
+        if(isset($bitbucket[$name]['codex_project'])){
+            return $bitbucket[$name]['codex_project'];
+        }
+    }
+    return $name;
+}
+
+
+
+function cdxc_get_codex_user_id(){
+
+    $user_id = get_current_user_id();
+
+    if(!$user_id) {
+        $user_id = get_option( 'cdxc_user_id' );
+    }
+    if(!$user_id){
+        $admin_email = get_option( 'admin_email' );
+        $admin = get_user_by( 'email', $admin_email  );
+        if(isset($admin->ID)){
+
+            $user_id = $admin->ID;
+            update_option('cdxc_user_id',$user_id);
+        }
+
+
+    }
+
+    if(!$user_id){
+        $random_password = wp_generate_password( 20,false );
+        $user_name = "Codex";
+        $user_email = $random_password."@".$random_password.".com";// create dummy email
+        $user_id = wp_create_user( $user_name, $random_password, $user_email );
+        update_option('cdxc_user_id',$user_id);
+    }
+
+    return $user_id;
 }

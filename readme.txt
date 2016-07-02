@@ -25,3 +25,6 @@ ACTIONS/FILTERS
 when writing a DocBlock for an action or filter the package name is not required.
 when the action/filter is inside a functions please use the see tag like this: @see my_awesome_functions_name function.
 If there are other filter or actions also in the containing functions please list theme with the see tag also: @see my_awesome_action_name action.
+
+IGNORE
+CC will skip directories containing .ccignore or ccignore.txt

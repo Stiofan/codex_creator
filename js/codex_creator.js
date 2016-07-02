@@ -498,3 +498,31 @@ function cdxc_get_bitbucket_repo($bitname,$biturl){
 
 
 }
+
+function cdxc_add_to_existing_project($type, $el, $project) {
+
+    if (!$type || !$el) {
+        return;
+    }// bail if no type
+
+    // This does the ajax request
+    jQuery.ajax({
+        url: ajaxurl,
+        data: {
+            'action': 'cdxc_add_to_existing_project',
+            'c_type': $type,
+            'c_name': $el,
+            'c_project': $project
+        },
+        success: function (data) {
+             jQuery('.cc-add-update-project-bloc').html(data);
+            //jQuery('.codex-creator-step-3 .codex-creator-step-content').prepend(data);
+            // jQuery('.codex-creator-step-3 .codex-creator-step-content').html(data);
+            console.log(data);
+        },
+        error: function (errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+
+}

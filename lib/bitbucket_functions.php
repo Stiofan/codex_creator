@@ -215,10 +215,8 @@ function cdxc_set_bitbucket($name,$url){
     if(empty($name)){return false;}
     $githubs = get_option('cdxc_bitbucket_repos');
 
-    $githubs[$name] = array(
-        'Name'  => $name,
-        'url'   => $url
-    );
+    $githubs[$name]['Name']=$name;
+    $githubs[$name]['url']=$url;
 
     update_option('cdxc_bitbucket_repos',$githubs);
 

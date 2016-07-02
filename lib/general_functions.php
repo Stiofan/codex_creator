@@ -355,6 +355,7 @@ function cdxc_sync_file($c_type='',$c_name='',$file_loc='',$first_run='')
         update_option("cdxc_".$c_type."_".$c_name,array());
     }
 
+    $c_name = cdxc_get_project_by_name($c_name,$c_type);
 
     // check file is in plugin dir
 
@@ -429,6 +430,7 @@ function cdxc_sync_file($c_type='',$c_name='',$file_loc='',$first_run='')
 
         // Create post object
         $my_post = array(
+            'post_author' => cdxc_get_codex_user_id(),
             'post_title' => $file,//$file_path ,
             'post_name' => $file,//str_replace('/', "--", $file_path ),
             'post_type' => 'codex_creator',
@@ -436,9 +438,15 @@ function cdxc_sync_file($c_type='',$c_name='',$file_loc='',$first_run='')
             'post_status' => 'publish',
             'tax_input' => array('codex_project' => array($parent_id, $file_cat_id))
         );
-        // print_r($my_post);//exit;
+        print_r($my_post);//exit;
         // Insert the post into the database
         $post_id = wp_insert_post($my_post);
+        // we need this for logged out creation
+        if(!get_current_user_id()){
+            wp_set_object_terms ($post_id , array((int)$parent_id, (int)$file_cat_id), 'codex_project');
+        }
+
+
 
     }
 
@@ -588,6 +596,7 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
         exit;
     }elseif($c_type=='github'){
         $file_path = str_replace($upload_dir . '/cdxc_temp/'.$c_name.'/', "", $file_loc);
+        $file_path = str_replace($upload_dir . '/cdxc_temp/'.$c_name.'-master/', "", $file_loc);
     }
 
     $file = basename($file_loc);
@@ -649,6 +658,7 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
 
         // Create post object
         $my_post = array(
+            'post_author' => cdxc_get_codex_user_id(),
             'post_title' => $function_name,//$file_path ,
             'post_name' => $function_name,//str_replace('/', "--", $file_path ),
             'post_type' => 'codex_creator',
@@ -659,6 +669,10 @@ function cdxc_sync_function($file_loc,$func,$c_name,$hooks_arr,$c_type,$code)
         // print_r($my_post);//exit;
         // Insert the post into the database
         $post_id = wp_insert_post($my_post);
+        // we need this for logged out creation
+        if(!get_current_user_id()){
+            wp_set_object_terms ($post_id , array((int)$parent_id, (int)$file_cat_id), 'codex_project');
+        }
 
     }
 
@@ -855,6 +869,7 @@ function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
 
         // Create post object
         $my_post = array(
+            'post_author' => cdxc_get_codex_user_id(),
             'post_title' =>  $hook_name,//$file_path ,
             'post_name' =>  $hook_name,//str_replace('/', "--", $file_path ),
             'post_type' => 'codex_creator',
@@ -865,6 +880,10 @@ function cdxc_sync_action($file_loc,$hooks,$c_name,$func,$c_type,$code)
         // print_r($my_post);//exit;
         // Insert the post into the database
         $post_id = wp_insert_post($my_post);
+        // we need this for logged out creation
+        if(!get_current_user_id()){
+            wp_set_object_terms ($post_id , array((int)$parent_id, (int)$file_cat_id), 'codex_project');
+        }
 
     }
 
@@ -1062,6 +1081,7 @@ function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
 
         // Create post object
         $my_post = array(
+            'post_author' => cdxc_get_codex_user_id(),
             'post_title' =>  $hook_name,//$file_path ,
             'post_name' =>  $hook_name,//str_replace('/', "--", $file_path ),
             'post_type' => 'codex_creator',
@@ -1072,6 +1092,10 @@ function cdxc_sync_filter($file_loc,$hooks,$c_name,$func,$c_type,$code)
         // print_r($my_post);//exit;
         // Insert the post into the database
         $post_id = wp_insert_post($my_post);
+        // we need this for logged out creation
+        if(!get_current_user_id()){
+            wp_set_object_terms ($post_id , array((int)$parent_id, (int)$file_cat_id), 'codex_project');
+        }
 
     }
 
@@ -1191,6 +1215,10 @@ function cdxc_calc_project_posts()
     $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $project));
 
     if (!$term_id) {
+        $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE slug=%s", $project));
+    }
+
+    if (!$term_id) {
         echo '0';
         exit;
     }
@@ -1224,6 +1252,11 @@ function cdxc_create_content_ajax()
 
 
     $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $project));
+
+    if (!$term_id) {
+        $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE slug=%s", $project));
+
+    }
 
     if (!$term_id) {
         echo '0';
@@ -1402,3 +1435,87 @@ function cdxc_get_git_repo_ajax($c_url='',$cron='')
 
 add_action('wp_ajax_cdxc_get_git_repo_ajax', 'cdxc_get_git_repo_ajax');
 
+
+/**
+ * Adds the project as a CTP category, called via ajax.
+ *
+ * @since 1.0.0
+ * @package Codex_Creator
+ */
+function cdxc_add_to_existing_project($type='',$name='',$project='')
+{
+
+    if(!$type){$type = esc_attr($_REQUEST['c_type']);}
+    if(!$name){$name = esc_attr($_REQUEST['c_name']);}
+    if(!$project){$project = esc_attr($_REQUEST['c_project']);}
+
+    if($project==''){
+        $terms = get_terms( array(
+            'taxonomy' => 'codex_project',
+            'hide_empty' => false,
+        ) );
+
+       // print_r($terms);
+        $c_terms = array();
+        $html = "<h4>".__('Please select a existing project to link to.', CDXC_TEXTDOMAIN)."</h4>";
+        foreach($terms as $term){
+            if($term->parent != 0){
+                continue;
+            }
+            $term_id = $term->term_id;
+            $term_name = $term->name;
+            $term_slug = $term->slug;
+            $html .= "<span onclick=\"cdxc_add_to_existing_project('$type','$name','$term_slug');\" class=\"cc-add-project-btn button button-primary\">$term_name ($term_slug)</span><br />";
+
+        }
+
+        echo $html;
+    }else{
+
+        if($type=='bitbucket'){
+            $bitbucket = get_option('cdxc_bitbucket_repos');
+            $bitbucket[$name]['codex_project'] = $project;
+            update_option('cdxc_bitbucket_repos',$bitbucket);
+            //sleep(1);
+            cdxc_status_text($type, $name);
+
+        }elseif($type=='github'){
+            $githubs = get_option('cdxc_github_repos');
+            $githubs[$name]['codex_project'] = $project;
+            update_option('cdxc_github_repos',$githubs);
+            //sleep(1);
+            cdxc_status_text($type, $name);
+        }
+
+    }
+exit;
+    $mute = false;
+    if(!$type){$type = esc_attr($_REQUEST['c_type']);}else{$mute = true;}
+    if(!$name){$name = esc_attr($_REQUEST['c_name']);}
+
+    if (!isset($name)) {
+        _e('There was a problem adding this project.', CDXC_TEXTDOMAIN);
+        die();
+    }
+    $project = array('cat_name' => $name, 'category_description' => '', 'taxonomy' => 'codex_project');
+    $result = wp_insert_category($project);
+
+
+    if ($result) {
+        if (is_wp_error($result)) {
+            $error_string = $result->get_error_message();
+            echo '<div id="message" class="error"><p>' . $error_string . '</p></div>';
+        } else {
+            if($mute){return;}
+            cdxc_status_text($type , $name);
+        }
+
+    } else {
+        _e('There was a problem adding this project.', CDXC_TEXTDOMAIN);
+    }
+    if($mute){return;}
+    die();
+}
+
+// add function to ajax
+add_action('wp_ajax_cdxc_add_to_existing_project', 'cdxc_add_to_existing_project');

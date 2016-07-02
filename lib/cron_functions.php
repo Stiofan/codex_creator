@@ -229,12 +229,14 @@ function cdxc_scan_project($type,$name,$key='')
     //print_r($files);
     //echo '###' . $scan_path;
 
-
+    $name = cdxc_get_project_by_name($name);
 
     $parent_id_arr = term_exists($name, 'codex_project');
     if (!isset($parent_id_arr['term_id'])) {
         cdxc_add_project($type,$name);// add parent project name if not exists
     }
+
+
     cdxc_scan_project_loop($type,$name,true,$files, $scan_path,'');
 
     cdxc_sync_project_files($name);
@@ -252,7 +254,14 @@ function cdxc_sync_project_files($project){
 
     global $wpdb;
 
+    //$project = cdxc_get_project_by_name($project);
+
+
     $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE name=%s", $project));
+
+    if (!$term_id) {
+        $term_id = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM $wpdb->terms WHERE slug=%s", $project));
+    }
 
     if (!$term_id) {
         return false;
@@ -272,6 +281,8 @@ function cdxc_sync_project_files($project){
 
 function cdxc_run_scan_action($type='',$name='',$key='')
 {
+
+    //print_r(wp_upload_dir());exit;
     if(!$type && isset($_REQUEST['c_type'])){$type = $_REQUEST['c_type'];}
     if(!$name && isset($_REQUEST['c_name'])){$name = $_REQUEST['c_name'];}
     if(!$key && isset($_REQUEST['c_key'])){$key= $_REQUEST['c_key'];}
